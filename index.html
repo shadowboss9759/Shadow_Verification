@@ -15,8 +15,8 @@
     body {
       background: #030712;
       background-image: 
-        radial-gradient(at 0% 0%, rgba(220, 38, 38, 0.2) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.15) 0px, transparent 50%);
+        radial-gradient(at 0% 0%, rgba(220, 38, 38, 0.25) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.2) 0px, transparent 50%);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -35,7 +35,7 @@
       max-width: 420px;
       width: 100%;
       text-align: center;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(220, 38, 38, 0.15);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(220, 38, 38, 0.2);
       position: relative;
       overflow: hidden;
     }
@@ -47,7 +47,7 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: conic-gradient(transparent, rgba(220, 38, 38, 0.3), transparent 30%);
+      background: conic-gradient(transparent, rgba(220, 38, 38, 0.35), transparent 30%);
       animation: rotate 5s linear infinite;
       z-index: -1;
     }
@@ -194,13 +194,13 @@
       margin-top: 25px;
       background: #000000;
       border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 10px 20px;
+      padding: 10px 22px;
       border-radius: 50px;
       color: #ffffff;
       font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.8px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.9), 0 0 15px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.95), 0 0 15px rgba(0, 0, 0, 0.8);
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -208,7 +208,7 @@
 
     .vip-credit span {
       color: #dc2626;
-      text-shadow: 0 0 8px rgba(220, 38, 38, 0.8);
+      text-shadow: 0 0 10px rgba(220, 38, 38, 0.9);
     }
   </style>
 </head>
@@ -222,7 +222,7 @@
     </div>
 
     <h2>VIP Security System</h2>
-    <p>Please complete human verification to access private link.</p>
+    <p>Please complete human verification to proceed.</p>
 
     <div class="verify-box" id="verifyBox" onclick="startVerification()">
       <div class="checkbox-container">
@@ -247,94 +247,125 @@
     </div>
   </div>
 
-<script>
-  // 1. Fully Automatic Bot / Source Identifier (Zero Link Changes Required)
-  function getAutoBotIdentifier() {
-    // Check Telegram WebApp referrer / start param
-    if (window.Telegram && window.Telegram.WebApp) {
-      const tg = window.Telegram.WebApp;
-      if (tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
-        return "tg_param_" + tg.initDataUnsafe.start_param;
+  <script>
+    // ⬇️ DEFAULT FALLBACK LINK (Jab link me webhook na ho toh yahan bhejega) ⬇️
+    const DEFAULT_FALLBACK_URL = "https://t.me/shadow_empire_tm"; 
+
+    // 1. UNIVERSAL AUTO-BOT DETECTOR (No Bot Code Changes Required)
+    function getUniversalBotId() {
+      const params = new URLSearchParams(window.location.search);
+
+      // Check 1: Explicit username or bot parameter
+      if (params.get('botusername')) return "bot_" + params.get('botusername');
+      if (params.get('bot')) return "bot_" + params.get('bot');
+      if (params.get('bot_id')) return "bot_" + params.get('bot_id');
+
+      // Check 2: Extract from botToken (e.g. 123456:ABC... -> 123456)
+      if (params.get('bottoken')) {
+        const tokenId = params.get('bottoken').split(':')[0];
+        if (tokenId) return "token_" + tokenId;
       }
-    }
 
-    // Check HTTP Referrer (Konsa Bot link open kar raha hai)
-    const referrer = document.referrer;
-    if (referrer && referrer.includes("t.me")) {
-      // Extract Telegram Bot username/chat automatically from link
-      const cleanRef = referrer.replace(/https?:\/\/(www\.)?t\.me\//, '').split('/')[0];
-      if (cleanRef) return "tg_ref_" + cleanRef;
-    }
-
-    // Fallback: Auto Session Key for unique app isolation
-    let sessionBotId = sessionStorage.getItem("auto_detected_bot_id");
-    if (!sessionBotId) {
-      sessionBotId = "auto_session_" + Math.random().toString(36).substring(2, 9);
-      sessionStorage.setItem("auto_detected_bot_id", sessionBotId);
-    }
-    return sessionBotId;
-  }
-
-  // Auto-detect Bot ID without changing any URL link!
-  const currentBotId = getAutoBotIdentifier();
-
-  // 2. Target Link (Verification ke baad jahan bhejna ho)
-  const TARGET_URL = "https://t.me/shadow_empire_tm"; 
-
-  // 3. Unique Storage Key for this specific bot context
-  const DEVICE_LOCK_KEY = "daddy_huu_verified_" + currentBotId;
-
-  let isVerifying = false;
-
-  function startVerification() {
-    if (isVerifying) return;
-    isVerifying = true;
-
-    const box = document.getElementById('verifyBox');
-    const text = document.getElementById('statusText');
-    const spinner = document.getElementById('spinner');
-    const statusMsg = document.getElementById('statusMsg');
-    const checkIcon = document.getElementById('checkIcon');
-    const crossIcon = document.getElementById('crossIcon');
-
-    text.innerText = "Scanning Security...";
-    spinner.style.display = "block";
-
-    setTimeout(() => {
-      spinner.style.display = "none";
-
-      // Specific bot context check
-      const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
-
-      if (isAlreadyVerified) {
-        // Blocked for this specific bot session
-        box.classList.add('failed');
-        checkIcon.style.display = "none";
-        crossIcon.style.display = "block";
-        text.innerText = "Verification Failed!";
-        text.style.color = "#ef4444";
-
-        statusMsg.className = "status-msg danger";
-        statusMsg.innerText = "❌ Security Alert: Already verified for this session!";
-        statusMsg.style.display = "block";
-      } else {
-        // First time success for this bot
-        localStorage.setItem(DEVICE_LOCK_KEY, "VERIFIED_" + Date.now());
-
-        box.classList.add('verified');
-        text.innerText = "Verified Successfully!";
-        text.style.color = "#10b981";
-
-        statusMsg.className = "status-msg success";
-        statusMsg.innerText = "✔ Success! Redirecting in 2s...";
-        statusMsg.style.display = "block";
-
-        setTimeout(() => {
-          window.location.href = TARGET_URL;
-        }, 2000);
+      // Check 3: Extract from webhook URL
+      if (params.get('webhook')) {
+        return "wh_" + btoa(params.get('webhook')).replace(/[^a-zA-Z0-9]/g, '').substring(0, 15);
       }
-    }, 1500);
-  }
-</script>
+
+      // Check 4: Any URL query parameter combination
+      const allKeys = Array.from(params.keys()).sort();
+      let paramString = "";
+      allKeys.forEach(key => {
+        if (key !== 'hash' && key !== 'random_hash' && key !== 't') {
+          paramString += key + "=" + params.get(key) + ";";
+        }
+      });
+      if (paramString.length > 0) {
+        return "params_" + btoa(paramString).replace(/[^a-zA-Z0-9]/g, '').substring(0, 15);
+      }
+
+      // Check 5: Telegram HTTP Referrer
+      if (document.referrer && document.referrer.includes('t.me/')) {
+        const refName = document.referrer.split('t.me/')[1].split('/')[0].split('?')[0];
+        if (refName) return "ref_" + refName;
+      }
+
+      // Fallback if direct browser open with no params
+      return "global_default_bot";
+    }
+
+    // 2. UNIVERSAL REDIRECT RESOLVER
+    function getRedirectDestination() {
+      const params = new URLSearchParams(window.location.search);
+
+      // Webhook response
+      if (params.get('webhook')) {
+        try {
+          return decodeURIComponent(params.get('webhook'));
+        } catch(e) {}
+      }
+
+      // Bot username target
+      const botName = params.get('botusername') || params.get('bot');
+      if (botName) {
+        return "https://t.me/" + botName.replace('@', '');
+      }
+
+      return DEFAULT_FALLBACK_URL;
+    }
+
+    const currentBotId = getUniversalBotId();
+    const DEVICE_LOCK_KEY = "daddy_huu_verified_" + currentBotId;
+
+    let isVerifying = false;
+
+    function startVerification() {
+      if (isVerifying) return;
+      isVerifying = true;
+
+      const box = document.getElementById('verifyBox');
+      const text = document.getElementById('statusText');
+      const spinner = document.getElementById('spinner');
+      const statusMsg = document.getElementById('statusMsg');
+      const checkIcon = document.getElementById('checkIcon');
+      const crossIcon = document.getElementById('crossIcon');
+
+      text.innerText = "Analyzing Security...";
+      spinner.style.display = "block";
+
+      setTimeout(() => {
+        spinner.style.display = "none";
+
+        const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
+
+        if (isAlreadyVerified) {
+          // Double verification attempt in same bot
+          box.classList.add('failed');
+          checkIcon.style.display = "none";
+          crossIcon.style.display = "block";
+          text.innerText = "Verification Failed!";
+          text.style.color = "#ef4444";
+
+          statusMsg.className = "status-msg danger";
+          statusMsg.innerText = "❌ Security Alert: Device already verified for this bot!";
+          statusMsg.style.display = "block";
+        } else {
+          // Success case
+          localStorage.setItem(DEVICE_LOCK_KEY, "VERIFIED_" + Date.now());
+
+          box.classList.add('verified');
+          text.innerText = "Verified Successfully!";
+          text.style.color = "#10b981";
+
+          statusMsg.className = "status-msg success";
+          statusMsg.innerText = "✔ Success! Redirecting in 2s...";
+          statusMsg.style.display = "block";
+
+          setTimeout(() => {
+            window.location.href = getRedirectDestination();
+          }, 2000);
+        }
+      }, 1500);
+    }
+  </script>
 </body>
 </html>
