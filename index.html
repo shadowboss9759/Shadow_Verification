@@ -446,8 +446,8 @@
     </div>
   </div>
 
-<script>
-  // Initialize Telegram MiniApp
+  <script>
+  // Initialize Telegram MiniApp SDK
   if (window.Telegram && window.Telegram.WebApp) {
     try {
       window.Telegram.WebApp.ready();
@@ -474,34 +474,44 @@
     return "global_default_bot";
   }
 
-  // 2. GUARANTEED WEBHOOK TRIGGER (BYPASSES CORS VIA SCRIPT TAG INJECTION)
-  function executeBotWebhook() {
+  // 2. TELEBOTCREATER + ALL BOT PLATFORMS TRIGGER FIX
+  function executeBotWebhook(userId) {
     const params = new URLSearchParams(window.location.search);
     const webhookUrl = params.get('webhook');
 
-    if (webhookUrl) {
-      const cleanUrl = decodeURIComponent(webhookUrl);
-      
-      // Inject Script element (100% Guaranteed to hit BotBusiness backend)
+    // Method A: Telebotcreater Native MiniApp Data Trigger
+    if (window.Telegram && window.Telegram.WebApp) {
       try {
-        const scriptElement = document.createElement('script');
-        scriptElement.src = cleanUrl + (cleanUrl.includes('?') ? '&' : '?') + '_nocache=' + Date.now();
-        document.body.appendChild(scriptElement);
+        window.Telegram.WebApp.sendData(JSON.stringify({ status: "verified", user_id: userId }));
+      } catch(e) {
+        try { window.Telegram.WebApp.sendData("verified"); } catch(err) {}
+      }
+    }
+
+    // Method B: Invisible Iframe Webhook Trigger (Fixes Black Screen & CORS)
+    if (webhookUrl) {
+      try {
+        const cleanUrl = decodeURIComponent(webhookUrl);
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = cleanUrl + (cleanUrl.includes('?') ? '&' : '?') + 'user_id=' + userId + '&t=' + Date.now();
+        document.body.appendChild(iframe);
       } catch(e) {}
 
-      // Fallback Fetch
+      // Backup Image Ping
       try {
-        fetch(cleanUrl, { mode: 'no-cors', cache: 'no-cache' }).catch(() => {});
+        const img = new Image();
+        img.src = decodeURIComponent(webhookUrl);
       } catch(e) {}
     }
   }
 
-  // 3. CLOSE WEBAPP / REDIRECT TO BOT
+  // 3. CLOSE WEBAPP / REDIRECT TO TELEGRAM BOT
   function closeOrRedirect() {
-    executeBotWebhook();
-
     const params = new URLSearchParams(window.location.search);
     const botName = params.get('botusername') || params.get('bot') || params.get('bot_id');
+
+    executeBotWebhook(currentUserId);
 
     setTimeout(() => {
       // Close Telegram MiniApp Window
@@ -513,15 +523,18 @@
       if (botName && !botName.startsWith('http')) {
         const cleanName = botName.replace('@', '').trim();
         window.location.href = "https://t.me/" + cleanName;
+      } else if (document.referrer && document.referrer.includes('t.me/')) {
+        window.location.href = document.referrer;
       } else {
         window.location.href = "https://t.me";
       }
-    }, 700);
+    }, 800);
   }
 
   const currentBotId = getUniversalBotId();
   const DEVICE_LOCK_KEY = "daddy_huu_verified_" + currentBotId;
   let isVerifying = false;
+  let currentUserId = "";
 
   // Real User Details & Lock Check On Load
   window.addEventListener('load', () => {
@@ -545,6 +558,8 @@
       extractedId = params.get('user_id') || params.get('uid') || params.get('id') || "6259793146";
     }
 
+    currentUserId = extractedId;
+
     document.getElementById('userName').innerText = extractedName.toUpperCase();
     document.getElementById('userId').innerText = "ID: " + extractedId;
     document.getElementById('avatarText').innerText = extractedName.charAt(0).toUpperCase();
@@ -563,7 +578,7 @@
     }
   });
 
-  // Start Verification
+  // Start Verification Logic
   function startVerification() {
     if (isVerifying) return;
     isVerifying = true;
@@ -625,15 +640,19 @@
         badgeText.innerText = "ACTIVE";
         btnContinue.style.display = "block";
 
-        // 🔥 Instant Webhook Execution Signal
-        executeBotWebhook();
+        // 🔥 Telebotcreater Webhook Execution
+        executeBotWebhook(currentUserId);
 
         setTimeout(() => {
           closeOrRedirect();
-        }, 1200);
+        }, 1000);
       }
     }, 1500);
   }
-</script>
+
+  function redirectToBot() {
+    closeOrRedirect();
+  }
+  </script>
 </body>
 </html>
