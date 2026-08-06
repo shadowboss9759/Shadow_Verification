@@ -452,7 +452,7 @@
     try {
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand();
-    } catch(e) {}
+    } catch(e) { console.error("WebApp Init Error:", e); }
   }
 
   // Universal Bot ID Detector
@@ -469,60 +469,78 @@
   const DEVICE_LOCK_KEY = "daddy_huu_verified_" + currentBotId;
   let isVerifying = false;
 
-  // 🎯 GUARANTEED WEBHOOK EXECUTION (WAITS FOR SERVER RESPONSE BEFORE CLOSING)
-  function triggerWebhookAndFinish() {
+  // 🎯 FIXED & IMPROVED WEBHOOK EXECUTION
+  async function triggerWebhookAndFinish() {
     const params = new URLSearchParams(window.location.search);
     const rawWebhook = params.get('webhook');
     const botName = params.get('botusername') || params.get('bot') || params.get('bot_id');
+    
+    // Get user info to append to webhook
+    let userId = "";
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+      userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    } else {
+      userId = params.get('user_id') || params.get('uid') || params.get('id') || "";
+    }
 
     // Final Close & Redirect Function
     function finalize() {
-  if (window.Telegram && window.Telegram.WebApp) {
-    try {
-      Telegram.WebApp.sendData(JSON.stringify({
-        status: "verified",
-        time: Date.now()
-      }));
-
+      if (window.Telegram && window.Telegram.WebApp) {
+        // Try to send data (only works for keyboard buttons)
+        try { window.Telegram.WebApp.sendData("verified"); } catch(e) {}
+        // Close the webapp
+        try { window.Telegram.WebApp.close(); } catch(e) {}
+      }
+      
+      // Fallback Redirect (for browser or if WebApp.close didn't trigger)
       setTimeout(() => {
-        Telegram.WebApp.close();
-      }, 1000);
-
-    } catch (e) {
-      Telegram.WebApp.close();
+        if (botName && !botName.startsWith('http')) {
+          const cleanName = botName.replace('@', '').trim();
+          window.location.href = "https://t.me/" + cleanName;
+        } else {
+          window.location.href = "https://t.me";
+        }
+      }, 500);
     }
-  }
-}
 
     if (rawWebhook) {
-      const cleanUrl = decodeURIComponent(rawWebhook);
-      const pingImg = new Image();
-      let isExecuted = false;
-
-      function onServerResponse() {
-        if (isExecuted) return;
-        isExecuted = true;
-        // Server has received webhook & processed /onWebhook -> Now Safe to Close
-        setTimeout(finalize, 300);
+      let cleanUrl = decodeURIComponent(rawWebhook);
+      
+      // Auto-append user_id and status to ensure bot receives the update
+      if (userId && !cleanUrl.includes('user_id=') && !cleanUrl.includes('uid=')) {
+        cleanUrl += (cleanUrl.includes('?') ? '&' : '?') + 'user_id=' + userId + '&status=verified';
+      } else if (!cleanUrl.includes('status=')) {
+        cleanUrl += (cleanUrl.includes('?') ? '&' : '?') + 'status=verified';
       }
+      
+      // Add cache buster
+      cleanUrl += (cleanUrl.includes('?') ? '&' : '?') + '_cb=' + Date.now();
 
-      // Fires as soon as Bot Server responds back with OK
-      pingImg.onload = onServerResponse;
-      pingImg.onerror = onServerResponse;
-
-      // Backup Safety Timeout (3 sec max)
-      setTimeout(onServerResponse, 3000);
-
-      // Trigger Webhook Request
-      pingImg.src = cleanUrl + (cleanUrl.includes('?') ? '&' : '?') + '_cb=' + Date.now();
-
-      // Native WebApp sendData backup
-      if (window.Telegram && window.Telegram.WebApp) {
-        try { window.Telegram.WebApp.sendData("verified"); } catch(e) {}
+      try {
+        // Use fetch with keepalive to ensure it hits the server even if we close the window
+        await fetch(cleanUrl, { mode: 'no-cors', keepalive: true });
+        setTimeout(finalize, 800); // Give server time to process
+      } catch (e) {
+        // Fallback to Image ping if fetch fails
+        const pingImg = new Image();
+        pingImg.onload = finalize;
+        pingImg.onerror = finalize;
+        pingImg.src = cleanUrl;
+        setTimeout(finalize, 3000); // Backup timeout
       }
     } else {
       finalize();
     }
+  }
+
+  // FIXED: Added missing function that was called by the button
+  function closeOrRedirect() {
+    triggerWebhookAndFinish();
+  }
+
+  // For compatibility
+  function redirectToBot() {
+    triggerWebhookAndFinish();
   }
 
   // Extract User Info & Check Verified State
@@ -595,7 +613,6 @@
 
     setTimeout(() => {
       spinner.style.display = "none";
-
       const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
 
       if (isAlreadyVerified) {
@@ -629,10 +646,6 @@
         triggerWebhookAndFinish();
       }
     }, 1500);
-  }
-
-  function redirectToBot() {
-    triggerWebhookAndFinish();
   }
 </script>
 </body>
