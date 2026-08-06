@@ -380,10 +380,10 @@
   <!-- Top User Profile Bar -->
   <div class="top-header">
     <div class="user-info">
-      <div class="avatar">S</div>
+      <div class="avatar" id="avatarText">U</div>
       <div class="user-details">
-        <h4>SHADOW SYSTEM</h4>
-        <p>ID: 6259793146</p>
+        <h4 id="userName">GUEST USER</h4>
+        <p id="userId">ID: --------</p>
       </div>
     </div>
     <div class="status-badge" id="statusBadge">
@@ -391,6 +391,7 @@
       <span id="badgeText">SCANNING</span>
     </div>
   </div>
+
 
   <!-- Central Card -->
   <div class="card" id="mainCard">
@@ -445,7 +446,7 @@
   </div>
 
 <script>
-  // 1. UNIVERSAL AUTO-BOT DETECTOR (100% Exact Same Logic as Before)
+  // 1. UNIVERSAL AUTO-BOT DETECTOR
   function getUniversalBotId() {
     const params = new URLSearchParams(window.location.search);
 
@@ -481,30 +482,42 @@
     return "global_default_bot";
   }
 
-  // 2. ONLY-BOT REDIRECT RESOLVER (No Channel Link!)
-  function getRedirectDestination() {
+  // 2. PERFECT BOT REDIRECT (No Black Screen / No Raw JSON)
+  function handleBotRedirect() {
     const params = new URLSearchParams(window.location.search);
+    const webhookUrl = params.get('webhook');
 
-    if (params.get('webhook')) {
+    // Step A: Background Silent Webhook Ping (Aapka Bot update ho jaye without opening black page)
+    if (webhookUrl) {
       try {
-        return decodeURIComponent(params.get('webhook'));
+        fetch(decodeURIComponent(webhookUrl)).catch(e => console.log("Webhook pinged"));
       } catch(e) {}
     }
 
+    // Step B: Direct Redirect to Bot UI
     const botName = params.get('botusername') || params.get('bot') || params.get('bot_id');
+    
+    // 1. Telegram WebApp Close (Agar WebApp inside opened hai toh smooth close ho jaye)
+    if (window.Telegram && window.Telegram.WebApp) {
+      setTimeout(() => {
+        try { window.Telegram.WebApp.close(); } catch(e) {}
+      }, 500);
+    }
+
+    // 2. Browser Redirect to Bot Link
     if (botName && !botName.startsWith('http')) {
       const cleanBotName = botName.replace('@', '').trim();
-      return "https://t.me/" + cleanBotName;
-    }
-
-    if (document.referrer && document.referrer.includes('t.me/')) {
+      window.location.href = "https://t.me/" + cleanBotName;
+    } else if (document.referrer && document.referrer.includes('t.me/')) {
       const refBot = document.referrer.split('t.me/')[1].split('/')[0].split('?')[0];
       if (refBot && refBot.length > 0) {
-        return "https://t.me/" + refBot;
+        window.location.href = "https://t.me/" + refBot;
+      } else {
+        window.location.href = "https://t.me";
       }
+    } else {
+      window.location.href = "https://t.me";
     }
-
-    return "https://t.me";
   }
 
   const currentBotId = getUniversalBotId();
@@ -512,8 +525,28 @@
 
   let isVerifying = false;
 
-  // On Load Check if Device Already Verified
+  // On Load: Real User Details + Already Verified Check
   window.addEventListener('load', () => {
+    const params = new URLSearchParams(window.location.search);
+
+    // Dynamic User Name & ID Detection
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+      const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
+      const fullName = (tgUser.first_name + " " + (tgUser.last_name || "")).trim();
+      
+      document.getElementById('userName').innerText = fullName.toUpperCase();
+      document.getElementById('userId').innerText = "ID: " + tgUser.id;
+      document.getElementById('avatarText').innerText = tgUser.first_name.charAt(0).toUpperCase();
+    } else {
+      const uName = params.get('user_name') || params.get('name') || "TELEGRAM USER";
+      const uId = params.get('user_id') || params.get('uid') || "6259793146";
+
+      document.getElementById('userName').innerText = uName.toUpperCase();
+      document.getElementById('userId').innerText = "ID: " + uId;
+      document.getElementById('avatarText').innerText = uName.charAt(0).toUpperCase();
+    }
+
+    // Already Verified Check
     const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
     if (isAlreadyVerified) {
       document.getElementById('cardTitle').innerText = "Already Verified";
@@ -547,7 +580,6 @@
     spinner.style.display = "block";
     progressContainer.style.display = "block";
 
-    // Smooth Progress Bar Animation
     let progress = 0;
     const progressInterval = setInterval(() => {
       progress += 10;
@@ -563,7 +595,6 @@
       const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
 
       if (isAlreadyVerified) {
-        // Double verification attempt in same bot
         box.classList.add('failed');
         checkIcon.style.display = "none";
         crossIcon.style.display = "block";
@@ -576,7 +607,6 @@
 
         btnContinue.style.display = "block";
       } else {
-        // Success case
         localStorage.setItem(DEVICE_LOCK_KEY, "VERIFIED_" + Date.now());
 
         box.classList.add('verified');
@@ -592,14 +622,14 @@
         btnContinue.style.display = "block";
 
         setTimeout(() => {
-          redirectToBot();
-        }, 1800);
+          handleBotRedirect();
+        }, 1500);
       }
     }, 1500);
   }
 
   function redirectToBot() {
-    window.location.href = getRedirectDestination();
+    handleBotRedirect();
   }
 </script>
 </body>
