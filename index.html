@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIP Security Shield</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #030712;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(220, 38, 38, 0.2) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.15) 0px, transparent 50%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 28px;
+      padding: 40px 30px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(220, 38, 38, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(transparent, rgba(220, 38, 38, 0.3), transparent 30%);
+      animation: rotate 5s linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes rotate {
+      100% { transform: rotate(360deg); }
+    }
+
+    .shield-icon {
+      width: 75px;
+      height: 75px;
+      background: linear-gradient(135deg, #dc2626, #9333ea);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 10px 30px rgba(220, 38, 38, 0.5);
+    }
+
+    .shield-icon svg {
+      width: 38px;
+      height: 38px;
+      fill: #ffffff;
+    }
+
+    h2 {
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: #94a3b8;
+      font-size: 14px;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .verify-box {
+      background: rgba(3, 7, 18, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .verify-box:hover {
+      border-color: rgba(220, 38, 38, 0.6);
+      background: rgba(3, 7, 18, 0.9);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .checkbox {
+      width: 26px;
+      height: 26px;
+      border: 2px solid #475569;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .verify-box.verified .checkbox {
+      background: #10b981;
+      border-color: #10b981;
+    }
+
+    .verify-box.failed .checkbox {
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .checkbox svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: white;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.2s ease;
+    }
+
+    .verify-box.verified .checkbox svg,
+    .verify-box.failed .checkbox svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .verify-text {
+      color: #f8fafc;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-radius: 50%;
+      border-top-color: #dc2626;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .status-msg {
+      margin-top: 18px;
+      font-size: 13px;
+      font-weight: 600;
+      display: none;
+    }
+
+    .status-msg.success {
+      color: #34d399;
+    }
+
+    .status-msg.danger {
+      color: #f87171;
+    }
+
+    /* VIP Black Shadow Credit Banner */
+    .vip-credit {
+      margin-top: 25px;
+      background: #000000;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 10px 20px;
+      border-radius: 50px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.9), 0 0 15px rgba(0, 0, 0, 0.8);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .vip-credit span {
+      color: #dc2626;
+      text-shadow: 0 0 8px rgba(220, 38, 38, 0.8);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="shield-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8s0 0 0 0z"/>
+      </svg>
+    </div>
+
+    <h2>VIP Security System</h2>
+    <p>Please complete human verification to access private link.</p>
+
+    <div class="verify-box" id="verifyBox" onclick="startVerification()">
+      <div class="checkbox-container">
+        <div class="checkbox" id="checkbox">
+          <svg id="checkIcon" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <svg id="crossIcon" viewBox="0 0 24 24" style="display:none;">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </div>
+        <span class="verify-text" id="statusText">I am human</span>
+      </div>
+      <div class="spinner" id="spinner"></div>
+    </div>
+
+    <div class="status-msg" id="statusMsg"></div>
+
+    <div class="vip-credit">
+      MADE BY <span>@Daddy_Huu</span>
+    </div>
+  </div>
+
+  <script>
+    // ⬇️ APNA TELEGRAM LINK YA DESTINATION URL PASTE KAREIN ⬇️
+    const TARGET_URL = "https://t.me/shadow_empire_tm"; 
+
+    // Device Persistent Lock Key
+    const DEVICE_LOCK_KEY = "daddy_huu_verified_device_token";
+
+    let isVerifying = false;
+
+    function startVerification() {
+      if (isVerifying) return;
+      isVerifying = true;
+
+      const box = document.getElementById('verifyBox');
+      const text = document.getElementById('statusText');
+      const spinner = document.getElementById('spinner');
+      const statusMsg = document.getElementById('statusMsg');
+      const checkIcon = document.getElementById('checkIcon');
+      const crossIcon = document.getElementById('crossIcon');
+
+      text.innerText = "Checking Device Security...";
+      spinner.style.display = "block";
+
+      setTimeout(() => {
+        spinner.style.display = "none";
+
+        // Check if device already verified once
+        const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
+
+        if (isAlreadyVerified) {
+          // FAIL CASE (Second attempt / Airplane mode / Refresh)
+          box.classList.add('failed');
+          checkIcon.style.display = "none";
+          crossIcon.style.display = "block";
+          text.innerText = "Verification Failed!";
+          text.style.color = "#ef4444";
+
+          statusMsg.className = "status-msg danger";
+          statusMsg.innerText = "❌ Access Denied! This device has already completed verification.";
+          statusMsg.style.display = "block";
+        } else {
+          // SUCCESS CASE (First Time Only)
+          localStorage.setItem(DEVICE_LOCK_KEY, "TRUE_VERIFIED_" + Date.now());
+
+          box.classList.add('verified');
+          text.innerText = "Verified Successfully!";
+          text.style.color = "#10b981";
+
+          statusMsg.className = "status-msg success";
+          statusMsg.innerText = "✔ Success! Redirecting in 2s...";
+          statusMsg.style.display = "block";
+
+          setTimeout(() => {
+            window.location.href = TARGET_URL;
+          }, 2000);
+        }
+      }, 1500);
+    }
+  </script>
+</body>
+</html>
