@@ -447,21 +447,36 @@
   </div>
 
 <script>
-  // Telegram WebApp SDK Setup
+  // Telegram MiniApp SDK Setup
   if (window.Telegram && window.Telegram.WebApp) {
     try {
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand();
-    } catch(e) { console.error("WebApp Init Error:", e); }
+    } catch(e) {}
   }
 
-  // Universal Bot ID Detector
+  // 1. EXTRACT CLEAN WEBHOOK URL
+  function getCleanWebhookUrl() {
+    const currentUrl = window.location.href;
+    if (currentUrl.includes('webhook=')) {
+      let rawParam = currentUrl.split('webhook=')[1];
+      try {
+        return decodeURIComponent(rawParam);
+      } catch(e) {
+        return rawParam;
+      }
+    }
+    return null;
+  }
+
+  // 2. UNIVERSAL BOT ID DETECTOR
   function getUniversalBotId() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('botusername')) return "bot_" + params.get('botusername');
     if (params.get('bot')) return "bot_" + params.get('bot');
     if (params.get('bot_id')) return "bot_" + params.get('bot_id');
-    if (params.get('webhook')) return "wh_" + btoa(params.get('webhook')).replace(/[^a-zA-Z0-9]/g, '').substring(0, 15);
+    const wh = getCleanWebhookUrl();
+    if (wh) return "wh_" + btoa(wh).replace(/[^a-zA-Z0-9]/g, '').substring(0, 15);
     return "global_default_bot";
   }
 
@@ -469,81 +484,69 @@
   const DEVICE_LOCK_KEY = "daddy_huu_verified_" + currentBotId;
   let isVerifying = false;
 
-  // 🎯 FIXED & IMPROVED WEBHOOK EXECUTION
-  async function triggerWebhookAndFinish() {
-    const params = new URLSearchParams(window.location.search);
-    const rawWebhook = params.get('webhook');
-    const botName = params.get('botusername') || params.get('bot') || params.get('bot_id');
-    
-    // Get user info to append to webhook
-    let userId = "";
-    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-      userId = window.Telegram.WebApp.initDataUnsafe.user.id;
-    } else {
-      userId = params.get('user_id') || params.get('uid') || params.get('id') || "";
+  // 3. GUARANTEED TELEBOTCREATOR FORM SUBMISSION (BYPASSES CORS 100%)
+  function executeTelebotWebhook() {
+    const webhookUrl = getCleanWebhookUrl();
+
+    if (webhookUrl) {
+      // Remove previous dynamic elements if any
+      const oldIframe = document.getElementById('telebot_iframe');
+      if (oldIframe) oldIframe.remove();
+      const oldForm = document.getElementById('telebot_form');
+      if (oldForm) oldForm.remove();
+
+      // Create Invisible Target Iframe
+      const iframe = document.createElement('iframe');
+      iframe.id = 'telebot_iframe';
+      iframe.name = 'telebot_iframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      // Create Form targeting hidden iframe
+      const form = document.createElement('form');
+      form.id = 'telebot_form';
+      form.method = 'GET';
+      form.action = webhookUrl;
+      form.target = 'telebot_iframe';
+      document.body.appendChild(form);
+
+      // Submit Form (Triggers /onWebhook in Telebotcreator Backend!)
+      form.submit();
     }
 
-    // Final Close & Redirect Function
-    function finalize() {
+    // Backup: Send Data to Telegram Native WebApp
+    if (window.Telegram && window.Telegram.WebApp) {
+      try {
+        window.Telegram.WebApp.sendData("VERIFIED");
+      } catch(e) {}
+    }
+  }
+
+  // 4. CLOSE WEBAPP WITH TIME FOR TELEBOTCREATOR EXECUTION
+  function closeAndRedirect() {
+    executeTelebotWebhook();
+
+    const params = new URLSearchParams(window.location.search);
+    const botName = params.get('botusername') || params.get('bot') || params.get('bot_id');
+
+    // 1.5s Wait so Telebotcreator finishes running BJS command
+    setTimeout(() => {
       if (window.Telegram && window.Telegram.WebApp) {
-        // Try to send data (only works for keyboard buttons)
-        try { window.Telegram.WebApp.sendData("verified"); } catch(e) {}
-        // Close the webapp
         try { window.Telegram.WebApp.close(); } catch(e) {}
       }
-      
-      // Fallback Redirect (for browser or if WebApp.close didn't trigger)
-      setTimeout(() => {
-        if (botName && !botName.startsWith('http')) {
-          const cleanName = botName.replace('@', '').trim();
-          window.location.href = "https://t.me/" + cleanName;
-        } else {
-          window.location.href = "https://t.me";
-        }
-      }, 500);
-    }
 
-    if (rawWebhook) {
-      let cleanUrl = decodeURIComponent(rawWebhook);
-      
-      // Auto-append user_id and status to ensure bot receives the update
-      if (userId && !cleanUrl.includes('user_id=') && !cleanUrl.includes('uid=')) {
-        cleanUrl += (cleanUrl.includes('?') ? '&' : '?') + 'user_id=' + userId + '&status=verified';
-      } else if (!cleanUrl.includes('status=')) {
-        cleanUrl += (cleanUrl.includes('?') ? '&' : '?') + 'status=verified';
+      if (botName && !botName.startsWith('http')) {
+        const cleanName = botName.replace('@', '').trim();
+        window.location.href = "https://t.me/" + cleanName;
+      } else if (document.referrer && document.referrer.includes('t.me/')) {
+        window.location.href = document.referrer;
+      } else {
+        window.location.href = "https://t.me";
       }
-      
-      // Add cache buster
-      cleanUrl += (cleanUrl.includes('?') ? '&' : '?') + '_cb=' + Date.now();
-
-      try {
-        // Use fetch with keepalive to ensure it hits the server even if we close the window
-        await fetch(cleanUrl, { mode: 'no-cors', keepalive: true });
-        setTimeout(finalize, 800); // Give server time to process
-      } catch (e) {
-        // Fallback to Image ping if fetch fails
-        const pingImg = new Image();
-        pingImg.onload = finalize;
-        pingImg.onerror = finalize;
-        pingImg.src = cleanUrl;
-        setTimeout(finalize, 3000); // Backup timeout
-      }
-    } else {
-      finalize();
-    }
+    }, 1500);
   }
 
-  // FIXED: Added missing function that was called by the button
-  function closeOrRedirect() {
-    triggerWebhookAndFinish();
-  }
-
-  // For compatibility
-  function redirectToBot() {
-    triggerWebhookAndFinish();
-  }
-
-  // Extract User Info & Check Verified State
+  // Extract User Info & Check Verified Lock
   window.addEventListener('load', () => {
     const params = new URLSearchParams(window.location.search);
 
@@ -567,7 +570,7 @@
     document.getElementById('userId').innerText = "ID: " + extractedId;
     document.getElementById('avatarText').innerText = extractedName.charAt(0).toUpperCase();
 
-    // Already Verified Lock Check
+    // Already Verified Check
     const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
     if (isAlreadyVerified) {
       document.getElementById('cardTitle').innerText = "Already Verified";
@@ -613,6 +616,7 @@
 
     setTimeout(() => {
       spinner.style.display = "none";
+
       const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
 
       if (isAlreadyVerified) {
@@ -642,10 +646,14 @@
         badgeText.innerText = "ACTIVE";
         btnContinue.style.display = "block";
 
-        // 🔥 Wait for Server to complete Webhook execution BEFORE closing
-        triggerWebhookAndFinish();
+        // 🔥 Fire Form Webhook & Redirect
+        closeAndRedirect();
       }
     }, 1500);
+  }
+
+  function redirectToBot() {
+    closeAndRedirect();
   }
 </script>
 </body>
