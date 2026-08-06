@@ -247,64 +247,94 @@
     </div>
   </div>
 
-  <script>
-    // ⬇️ APNA TELEGRAM LINK YA DESTINATION URL PASTE KAREIN ⬇️
-    const TARGET_URL = "https://t.me/shadow_empire_tm"; 
-
-    // Device Persistent Lock Key
-    const DEVICE_LOCK_KEY = "daddy_huu_verified_device_token";
-
-    let isVerifying = false;
-
-    function startVerification() {
-      if (isVerifying) return;
-      isVerifying = true;
-
-      const box = document.getElementById('verifyBox');
-      const text = document.getElementById('statusText');
-      const spinner = document.getElementById('spinner');
-      const statusMsg = document.getElementById('statusMsg');
-      const checkIcon = document.getElementById('checkIcon');
-      const crossIcon = document.getElementById('crossIcon');
-
-      text.innerText = "Checking Device Security...";
-      spinner.style.display = "block";
-
-      setTimeout(() => {
-        spinner.style.display = "none";
-
-        // Check if device already verified once
-        const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
-
-        if (isAlreadyVerified) {
-          // FAIL CASE (Second attempt / Airplane mode / Refresh)
-          box.classList.add('failed');
-          checkIcon.style.display = "none";
-          crossIcon.style.display = "block";
-          text.innerText = "Verification Failed!";
-          text.style.color = "#ef4444";
-
-          statusMsg.className = "status-msg danger";
-          statusMsg.innerText = "❌ Access Denied! This device has already completed verification.";
-          statusMsg.style.display = "block";
-        } else {
-          // SUCCESS CASE (First Time Only)
-          localStorage.setItem(DEVICE_LOCK_KEY, "TRUE_VERIFIED_" + Date.now());
-
-          box.classList.add('verified');
-          text.innerText = "Verified Successfully!";
-          text.style.color = "#10b981";
-
-          statusMsg.className = "status-msg success";
-          statusMsg.innerText = "✔ Success! Redirecting in 2s...";
-          statusMsg.style.display = "block";
-
-          setTimeout(() => {
-            window.location.href = TARGET_URL;
-          }, 2000);
-        }
-      }, 1500);
+<script>
+  // 1. Fully Automatic Bot / Source Identifier (Zero Link Changes Required)
+  function getAutoBotIdentifier() {
+    // Check Telegram WebApp referrer / start param
+    if (window.Telegram && window.Telegram.WebApp) {
+      const tg = window.Telegram.WebApp;
+      if (tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
+        return "tg_param_" + tg.initDataUnsafe.start_param;
+      }
     }
-  </script>
+
+    // Check HTTP Referrer (Konsa Bot link open kar raha hai)
+    const referrer = document.referrer;
+    if (referrer && referrer.includes("t.me")) {
+      // Extract Telegram Bot username/chat automatically from link
+      const cleanRef = referrer.replace(/https?:\/\/(www\.)?t\.me\//, '').split('/')[0];
+      if (cleanRef) return "tg_ref_" + cleanRef;
+    }
+
+    // Fallback: Auto Session Key for unique app isolation
+    let sessionBotId = sessionStorage.getItem("auto_detected_bot_id");
+    if (!sessionBotId) {
+      sessionBotId = "auto_session_" + Math.random().toString(36).substring(2, 9);
+      sessionStorage.setItem("auto_detected_bot_id", sessionBotId);
+    }
+    return sessionBotId;
+  }
+
+  // Auto-detect Bot ID without changing any URL link!
+  const currentBotId = getAutoBotIdentifier();
+
+  // 2. Target Link (Verification ke baad jahan bhejna ho)
+  const TARGET_URL = "https://t.me/shadow_empire_tm"; 
+
+  // 3. Unique Storage Key for this specific bot context
+  const DEVICE_LOCK_KEY = "daddy_huu_verified_" + currentBotId;
+
+  let isVerifying = false;
+
+  function startVerification() {
+    if (isVerifying) return;
+    isVerifying = true;
+
+    const box = document.getElementById('verifyBox');
+    const text = document.getElementById('statusText');
+    const spinner = document.getElementById('spinner');
+    const statusMsg = document.getElementById('statusMsg');
+    const checkIcon = document.getElementById('checkIcon');
+    const crossIcon = document.getElementById('crossIcon');
+
+    text.innerText = "Scanning Security...";
+    spinner.style.display = "block";
+
+    setTimeout(() => {
+      spinner.style.display = "none";
+
+      // Specific bot context check
+      const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
+
+      if (isAlreadyVerified) {
+        // Blocked for this specific bot session
+        box.classList.add('failed');
+        checkIcon.style.display = "none";
+        crossIcon.style.display = "block";
+        text.innerText = "Verification Failed!";
+        text.style.color = "#ef4444";
+
+        statusMsg.className = "status-msg danger";
+        statusMsg.innerText = "❌ Security Alert: Already verified for this session!";
+        statusMsg.style.display = "block";
+      } else {
+        // First time success for this bot
+        localStorage.setItem(DEVICE_LOCK_KEY, "VERIFIED_" + Date.now());
+
+        box.classList.add('verified');
+        text.innerText = "Verified Successfully!";
+        text.style.color = "#10b981";
+
+        statusMsg.className = "status-msg success";
+        statusMsg.innerText = "✔ Success! Redirecting in 2s...";
+        statusMsg.style.display = "block";
+
+        setTimeout(() => {
+          window.location.href = TARGET_URL;
+        }, 2000);
+      }
+    }, 1500);
+  }
+</script>
 </body>
 </html>
