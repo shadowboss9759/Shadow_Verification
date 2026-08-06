@@ -447,7 +447,7 @@
   </div>
 
 <script>
-  // Initialize Telegram WebApp
+  // Initialize Telegram WebApp SDK
   if (window.Telegram && window.Telegram.WebApp) {
     try {
       window.Telegram.WebApp.ready();
@@ -455,10 +455,9 @@
     } catch(e) {}
   }
 
-  // 1. UNIVERSAL BOT ID DETECTOR
+  // 1. Universal Bot ID Detector
   function getUniversalBotId() {
     const params = new URLSearchParams(window.location.search);
-
     if (params.get('botusername')) return "bot_" + params.get('botusername');
     if (params.get('bot')) return "bot_" + params.get('bot');
     if (params.get('bot_id')) return "bot_" + params.get('bot_id');
@@ -475,76 +474,51 @@
     return "global_default_bot";
   }
 
-  // 2. TRIGGER WEBHOOK TO BOT (FIXES PENDING BOT STATE)
-  function triggerBotWebhook() {
+  const currentBotId = getUniversalBotId();
+  const DEVICE_LOCK_KEY = "daddy_huu_verified_" + currentBotId;
+  let isVerifying = false;
+
+  // 2. Safe Webhook Signal & Redirect
+  async function sendWebhookAndClose() {
     const params = new URLSearchParams(window.location.search);
     const webhookUrl = params.get('webhook');
 
+    // Send Webhook & Await Execution
     if (webhookUrl) {
-      const targetUrl = decodeURIComponent(webhookUrl);
-      
-      // Method 1: Invisible Beacon Ping
       try {
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon(targetUrl);
-        }
-      } catch(e) {}
-
-      // Method 2: Fetch No-CORS Call
-      try {
-        fetch(targetUrl, { mode: 'no-cors', cache: 'no-cache' }).catch(() => {});
-      } catch(e) {}
-
-      // Method 3: Image Ping (Guaranteed Execution)
-      try {
-        const img = new Image();
-        img.src = targetUrl + (targetUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+        const targetUrl = decodeURIComponent(webhookUrl);
+        await fetch(targetUrl, { mode: 'no-cors', cache: 'no-cache' });
       } catch(e) {}
     }
-  }
 
-  // 3. BOT REDIRECT & WEBAPP CLOSE
-  function handleBotRedirect() {
-    triggerBotWebhook();
-
-    const params = new URLSearchParams(window.location.search);
-    const botName = params.get('botusername') || params.get('bot') || params.get('bot_id');
-
-    // Smooth Close Telegram MiniApp Window
+    // Delay Close so Telegram Bot gets time to process command
     setTimeout(() => {
       if (window.Telegram && window.Telegram.WebApp) {
         try { window.Telegram.WebApp.close(); } catch(e) {}
       }
       
+      const botName = params.get('botusername') || params.get('bot') || params.get('bot_id');
       if (botName && !botName.startsWith('http')) {
-        const cleanBotName = botName.replace('@', '').trim();
-        window.location.href = "https://t.me/" + cleanBotName;
+        window.location.href = "https://t.me/" + botName.replace('@', '').trim();
       } else {
         window.location.href = "https://t.me";
       }
-    }, 600);
+    }, 1000);
   }
 
-  const currentBotId = getUniversalBotId();
-  const DEVICE_LOCK_KEY = "daddy_huu_verified_" + currentBotId;
-
-  let isVerifying = false;
-
-  // Real User Details & Lock Check On Load
+  // On Page Load: User Info + Already Verified Check
   window.addEventListener('load', () => {
     const params = new URLSearchParams(window.location.search);
 
     let extractedName = "";
     let extractedId = "";
 
-    // 1. From Native Telegram WebApp SDK
     if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
       const u = window.Telegram.WebApp.initDataUnsafe.user;
       extractedName = (u.first_name + " " + (u.last_name || "")).trim();
       extractedId = u.id;
     }
 
-    // 2. Fallback from URL parameters
     if (!extractedName) {
       extractedName = params.get('user_name') || params.get('name') || params.get('first_name') || "TELEGRAM USER";
     }
@@ -556,7 +530,7 @@
     document.getElementById('userId').innerText = "ID: " + extractedId;
     document.getElementById('avatarText').innerText = extractedName.charAt(0).toUpperCase();
 
-    // Lock State Check
+    // Already Verified Check
     const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
     if (isAlreadyVerified) {
       document.getElementById('cardTitle').innerText = "Already Verified";
@@ -570,6 +544,7 @@
     }
   });
 
+  // Start Verification Logic
   function startVerification() {
     if (isVerifying) return;
     isVerifying = true;
@@ -624,25 +599,21 @@
         text.style.color = "#10b981";
 
         statusMsg.className = "status-msg success";
-        statusMsg.innerText = "✔ Success! Redirecting to Bot...";
+        statusMsg.innerText = "✔ Success! Authorizing bot...";
         statusMsg.style.display = "block";
 
         badge.classList.add('active');
         badgeText.innerText = "ACTIVE";
         btnContinue.style.display = "block";
 
-        // Trigger webhook immediately to un-pending the bot!
-        triggerBotWebhook();
-
-        setTimeout(() => {
-          handleBotRedirect();
-        }, 1200);
+        // 🔥 Trigger Webhook Wait
+        sendWebhookAndClose();
       }
     }, 1500);
   }
 
   function redirectToBot() {
-    handleBotRedirect();
+    sendWebhookAndClose();
   }
 </script>
 </body>
