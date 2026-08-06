@@ -447,7 +447,7 @@
   </div>
 
 <script>
-  // Initialize Telegram MiniApp SDK
+  // Telegram WebApp SDK Setup
   if (window.Telegram && window.Telegram.WebApp) {
     try {
       window.Telegram.WebApp.ready();
@@ -468,82 +468,58 @@
   const currentBotId = getUniversalBotId();
   const DEVICE_LOCK_KEY = "daddy_huu_verified_" + currentBotId;
   let isVerifying = false;
-  let currentUserId = "";
 
-  // 1. GUARANTEED TELEBOTCREATOR WEBHOOK TRIGGER
-  function triggerTelebotWebhook() {
+  // 🎯 GUARANTEED WEBHOOK EXECUTION (WAITS FOR SERVER RESPONSE BEFORE CLOSING)
+  function triggerWebhookAndFinish() {
     const params = new URLSearchParams(window.location.search);
     const rawWebhook = params.get('webhook');
-
-    if (rawWebhook) {
-      const cleanUrl = decodeURIComponent(rawWebhook);
-
-      // Method A: Keepalive Fetch (Page close hone par bhi cancelled nahi hoga)
-      try {
-        fetch(cleanUrl, {
-          method: 'GET',
-          mode: 'no-cors',
-          keepalive: true,
-          cache: 'no-cache'
-        }).catch(() => {});
-      } catch(e) {}
-
-      // Method B: SendBeacon (Background execution guarantee)
-      try {
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon(cleanUrl);
-        }
-      } catch(e) {}
-
-      // Method C: Image Ping
-      try {
-        const img = new Image();
-        img.src = cleanUrl + (cleanUrl.includes('?') ? '&' : '?') + '_t=' + Date.now();
-      } catch(e) {}
-
-      // Method D: Hidden Iframe
-      try {
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = cleanUrl;
-        document.body.appendChild(iframe);
-      } catch(e) {}
-    }
-
-    // Method E: Telebotcreator Native WebApp Data
-    if (window.Telegram && window.Telegram.WebApp) {
-      try {
-        window.Telegram.WebApp.sendData(JSON.stringify({ status: "verified", user_id: currentUserId }));
-      } catch(e) {}
-    }
-  }
-
-  // 2. CLOSE WEBAPP WITH 2-SECOND DELAY FOR TELEBOTCREATOR EXECUTION
-  function closeAndRedirect() {
-    // Immediate Webhook Trigger
-    triggerTelebotWebhook();
-
-    const params = new URLSearchParams(window.location.search);
     const botName = params.get('botusername') || params.get('bot') || params.get('bot_id');
 
-    // 2 Second Wait so Telebotcreator executes /onWebhook & sends bot message
-    setTimeout(() => {
+    // Final Close & Redirect Function
+    function finalize() {
       if (window.Telegram && window.Telegram.WebApp) {
         try { window.Telegram.WebApp.close(); } catch(e) {}
       }
-
       if (botName && !botName.startsWith('http')) {
         const cleanName = botName.replace('@', '').trim();
         window.location.href = "https://t.me/" + cleanName;
-      } else if (document.referrer && document.referrer.includes('t.me/')) {
-        window.location.href = document.referrer;
       } else {
         window.location.href = "https://t.me";
       }
-    }, 2000);
+    }
+
+    if (rawWebhook) {
+      const cleanUrl = decodeURIComponent(rawWebhook);
+      const pingImg = new Image();
+      let isExecuted = false;
+
+      function onServerResponse() {
+        if (isExecuted) return;
+        isExecuted = true;
+        // Server has received webhook & processed /onWebhook -> Now Safe to Close
+        setTimeout(finalize, 300);
+      }
+
+      // Fires as soon as Bot Server responds back with OK
+      pingImg.onload = onServerResponse;
+      pingImg.onerror = onServerResponse;
+
+      // Backup Safety Timeout (3 sec max)
+      setTimeout(onServerResponse, 3000);
+
+      // Trigger Webhook Request
+      pingImg.src = cleanUrl + (cleanUrl.includes('?') ? '&' : '?') + '_cb=' + Date.now();
+
+      // Native WebApp sendData backup
+      if (window.Telegram && window.Telegram.WebApp) {
+        try { window.Telegram.WebApp.sendData("verified"); } catch(e) {}
+      }
+    } else {
+      finalize();
+    }
   }
 
-  // On Load: Extract Real User Info & Check State
+  // Extract User Info & Check Verified State
   window.addEventListener('load', () => {
     const params = new URLSearchParams(window.location.search);
 
@@ -563,13 +539,11 @@
       extractedId = params.get('user_id') || params.get('uid') || params.get('id') || "6259793146";
     }
 
-    currentUserId = extractedId;
-
     document.getElementById('userName').innerText = extractedName.toUpperCase();
     document.getElementById('userId').innerText = "ID: " + extractedId;
     document.getElementById('avatarText').innerText = extractedName.charAt(0).toUpperCase();
 
-    // Already Verified Check
+    // Already Verified Lock Check
     const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
     if (isAlreadyVerified) {
       document.getElementById('cardTitle').innerText = "Already Verified";
@@ -583,7 +557,7 @@
     }
   });
 
-  // Verification Handler
+  // Start Verification
   function startVerification() {
     if (isVerifying) return;
     isVerifying = true;
@@ -645,14 +619,14 @@
         badgeText.innerText = "ACTIVE";
         btnContinue.style.display = "block";
 
-        // Execute Webhook & Safe Delay Close
-        closeAndRedirect();
+        // 🔥 Wait for Server to complete Webhook execution BEFORE closing
+        triggerWebhookAndFinish();
       }
     }, 1500);
   }
 
   function redirectToBot() {
-    closeAndRedirect();
+    triggerWebhookAndFinish();
   }
 </script>
 </body>
