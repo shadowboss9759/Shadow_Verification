@@ -247,125 +247,126 @@
     </div>
   </div>
 
-  <script>
-    // ⬇️ DEFAULT FALLBACK LINK (Jab link me webhook na ho toh yahan bhejega) ⬇️
-    const DEFAULT_FALLBACK_URL = "https://t.me/shadow_empire_tm"; 
+<script>
+  // 1. UNIVERSAL AUTO-BOT DETECTOR
+  function getUniversalBotId() {
+    const params = new URLSearchParams(window.location.search);
 
-    // 1. UNIVERSAL AUTO-BOT DETECTOR (No Bot Code Changes Required)
-    function getUniversalBotId() {
-      const params = new URLSearchParams(window.location.search);
+    if (params.get('botusername')) return "bot_" + params.get('botusername');
+    if (params.get('bot')) return "bot_" + params.get('bot');
+    if (params.get('bot_id')) return "bot_" + params.get('bot_id');
 
-      // Check 1: Explicit username or bot parameter
-      if (params.get('botusername')) return "bot_" + params.get('botusername');
-      if (params.get('bot')) return "bot_" + params.get('bot');
-      if (params.get('bot_id')) return "bot_" + params.get('bot_id');
-
-      // Check 2: Extract from botToken (e.g. 123456:ABC... -> 123456)
-      if (params.get('bottoken')) {
-        const tokenId = params.get('bottoken').split(':')[0];
-        if (tokenId) return "token_" + tokenId;
-      }
-
-      // Check 3: Extract from webhook URL
-      if (params.get('webhook')) {
-        return "wh_" + btoa(params.get('webhook')).replace(/[^a-zA-Z0-9]/g, '').substring(0, 15);
-      }
-
-      // Check 4: Any URL query parameter combination
-      const allKeys = Array.from(params.keys()).sort();
-      let paramString = "";
-      allKeys.forEach(key => {
-        if (key !== 'hash' && key !== 'random_hash' && key !== 't') {
-          paramString += key + "=" + params.get(key) + ";";
-        }
-      });
-      if (paramString.length > 0) {
-        return "params_" + btoa(paramString).replace(/[^a-zA-Z0-9]/g, '').substring(0, 15);
-      }
-
-      // Check 5: Telegram HTTP Referrer
-      if (document.referrer && document.referrer.includes('t.me/')) {
-        const refName = document.referrer.split('t.me/')[1].split('/')[0].split('?')[0];
-        if (refName) return "ref_" + refName;
-      }
-
-      // Fallback if direct browser open with no params
-      return "global_default_bot";
+    if (params.get('bottoken')) {
+      const tokenId = params.get('bottoken').split(':')[0];
+      if (tokenId) return "token_" + tokenId;
     }
 
-    // 2. UNIVERSAL REDIRECT RESOLVER
-    function getRedirectDestination() {
-      const params = new URLSearchParams(window.location.search);
-
-      // Webhook response
-      if (params.get('webhook')) {
-        try {
-          return decodeURIComponent(params.get('webhook'));
-        } catch(e) {}
-      }
-
-      // Bot username target
-      const botName = params.get('botusername') || params.get('bot');
-      if (botName) {
-        return "https://t.me/" + botName.replace('@', '');
-      }
-
-      return DEFAULT_FALLBACK_URL;
+    if (params.get('webhook')) {
+      return "wh_" + btoa(params.get('webhook')).replace(/[^a-zA-Z0-9]/g, '').substring(0, 15);
     }
 
-    const currentBotId = getUniversalBotId();
-    const DEVICE_LOCK_KEY = "daddy_huu_verified_" + currentBotId;
-
-    let isVerifying = false;
-
-    function startVerification() {
-      if (isVerifying) return;
-      isVerifying = true;
-
-      const box = document.getElementById('verifyBox');
-      const text = document.getElementById('statusText');
-      const spinner = document.getElementById('spinner');
-      const statusMsg = document.getElementById('statusMsg');
-      const checkIcon = document.getElementById('checkIcon');
-      const crossIcon = document.getElementById('crossIcon');
-
-      text.innerText = "Analyzing Security...";
-      spinner.style.display = "block";
-
-      setTimeout(() => {
-        spinner.style.display = "none";
-
-        const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
-
-        if (isAlreadyVerified) {
-          // Double verification attempt in same bot
-          box.classList.add('failed');
-          checkIcon.style.display = "none";
-          crossIcon.style.display = "block";
-          text.innerText = "Verification Failed!";
-          text.style.color = "#ef4444";
-
-          statusMsg.className = "status-msg danger";
-          statusMsg.innerText = "❌ Security Alert: Device already verified for this bot!";
-          statusMsg.style.display = "block";
-        } else {
-          // Success case
-          localStorage.setItem(DEVICE_LOCK_KEY, "VERIFIED_" + Date.now());
-
-          box.classList.add('verified');
-          text.innerText = "Verified Successfully!";
-          text.style.color = "#10b981";
-
-          statusMsg.className = "status-msg success";
-          statusMsg.innerText = "✔ Success! Redirecting in 2s...";
-          statusMsg.style.display = "block";
-
-          setTimeout(() => {
-            window.location.href = getRedirectDestination();
-          }, 2000);
-        }
-      }, 1500);
+    const allKeys = Array.from(params.keys()).sort();
+    let paramString = "";
+    allKeys.forEach(key => {
+      if (key !== 'hash' && key !== 'random_hash' && key !== 't') {
+        paramString += key + "=" + params.get(key) + ";";
+      }
+    });
+    if (paramString.length > 0) {
+      return "params_" + btoa(paramString).replace(/[^a-zA-Z0-9]/g, '').substring(0, 15);
     }
-  </script>
+
+    if (document.referrer && document.referrer.includes('t.me/')) {
+      const refName = document.referrer.split('t.me/')[1].split('/')[0].split('?')[0];
+      if (refName) return "ref_" + refName;
+    }
+
+    return "global_default_bot";
+  }
+
+  // 2. ONLY-BOT REDIRECT RESOLVER (No Channel Link!)
+  function getRedirectDestination() {
+    const params = new URLSearchParams(window.location.search);
+
+    // Option A: Webhook Response (Bot Callback)
+    if (params.get('webhook')) {
+      try {
+        return decodeURIComponent(params.get('webhook'));
+      } catch(e) {}
+    }
+
+    // Option B: Direct Bot Telegram Username
+    const botName = params.get('botusername') || params.get('bot') || params.get('bot_id');
+    if (botName && !botName.startsWith('http')) {
+      const cleanBotName = botName.replace('@', '').trim();
+      return "https://t.me/" + cleanBotName;
+    }
+
+    // Option C: Referrer Bot
+    if (document.referrer && document.referrer.includes('t.me/')) {
+      const refBot = document.referrer.split('t.me/')[1].split('/')[0].split('?')[0];
+      if (refBot && refBot.length > 0) {
+        return "https://t.me/" + refBot;
+      }
+    }
+
+    // Option D: Default Telegram App (No Channel)
+    return "https://t.me";
+  }
+
+  const currentBotId = getUniversalBotId();
+  const DEVICE_LOCK_KEY = "daddy_huu_verified_" + currentBotId;
+
+  let isVerifying = false;
+
+  function startVerification() {
+    if (isVerifying) return;
+    isVerifying = true;
+
+    const box = document.getElementById('verifyBox');
+    const text = document.getElementById('statusText');
+    const spinner = document.getElementById('spinner');
+    const statusMsg = document.getElementById('statusMsg');
+    const checkIcon = document.getElementById('checkIcon');
+    const crossIcon = document.getElementById('crossIcon');
+
+    text.innerText = "Analyzing Security...";
+    spinner.style.display = "block";
+
+    setTimeout(() => {
+      spinner.style.display = "none";
+
+      const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
+
+      if (isAlreadyVerified) {
+        // Double verification attempt in same bot
+        box.classList.add('failed');
+        checkIcon.style.display = "none";
+        crossIcon.style.display = "block";
+        text.innerText = "Verification Failed!";
+        text.style.color = "#ef4444";
+
+        statusMsg.className = "status-msg danger";
+        statusMsg.innerText = "❌ Security Alert: Device already verified for this bot!";
+        statusMsg.style.display = "block";
+      } else {
+        // Success case
+        localStorage.setItem(DEVICE_LOCK_KEY, "VERIFIED_" + Date.now());
+
+        box.classList.add('verified');
+        text.innerText = "Verified Successfully!";
+        text.style.color = "#10b981";
+
+        statusMsg.className = "status-msg success";
+        statusMsg.innerText = "✔ Success! Redirecting to Bot...";
+        statusMsg.style.display = "block";
+
+        setTimeout(() => {
+          window.location.href = getRedirectDestination();
+        }, 1800);
+      }
+    }, 1500);
+  }
+</script>
 </body>
 </html>
