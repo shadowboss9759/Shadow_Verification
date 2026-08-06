@@ -477,16 +477,22 @@
 
     // Final Close & Redirect Function
     function finalize() {
-      if (window.Telegram && window.Telegram.WebApp) {
-        try { window.Telegram.WebApp.close(); } catch(e) {}
-      }
-      if (botName && !botName.startsWith('http')) {
-        const cleanName = botName.replace('@', '').trim();
-        window.location.href = "https://t.me/" + cleanName;
-      } else {
-        window.location.href = "https://t.me";
-      }
+  if (window.Telegram && window.Telegram.WebApp) {
+    try {
+      Telegram.WebApp.sendData(JSON.stringify({
+        status: "verified",
+        time: Date.now()
+      }));
+
+      setTimeout(() => {
+        Telegram.WebApp.close();
+      }, 1000);
+
+    } catch (e) {
+      Telegram.WebApp.close();
     }
+  }
+}
 
     if (rawWebhook) {
       const cleanUrl = decodeURIComponent(rawWebhook);
