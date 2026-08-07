@@ -447,7 +447,7 @@
   </div>
 
 <script>
-  // Telegram MiniApp SDK Setup
+  // Initialize Telegram WebApp SDK
   if (window.Telegram && window.Telegram.WebApp) {
     try {
       window.Telegram.WebApp.ready();
@@ -455,18 +455,26 @@
     } catch(e) {}
   }
 
-  // 1. EXTRACT CLEAN WEBHOOK URL
-  function getCleanWebhookUrl() {
-    const currentUrl = window.location.href;
-    if (currentUrl.includes('webhook=')) {
-      let rawParam = currentUrl.split('webhook=')[1];
-      try {
-        return decodeURIComponent(rawParam);
-      } catch(e) {
-        return rawParam;
-      }
+  // 1. DEVICE FINGERPRINT GENERATOR (For Same-Device Security Check)
+  function getDeviceFingerprint() {
+    const components = [
+      navigator.userAgent,
+      screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
+      navigator.hardwareConcurrency || '4',
+      Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata',
+      navigator.language || 'en',
+      navigator.deviceMemory || '4'
+    ];
+    const str = components.join('###');
+    let h1 = 0xdeadbeef ^ 0, h2 = 0x41c6ce57 ^ 0;
+    for (let i = 0, ch; i < str.length; i++) {
+      ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
     }
-    return null;
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
   }
 
   // 2. UNIVERSAL BOT ID DETECTOR
@@ -475,8 +483,6 @@
     if (params.get('botusername')) return "bot_" + params.get('botusername');
     if (params.get('bot')) return "bot_" + params.get('bot');
     if (params.get('bot_id')) return "bot_" + params.get('bot_id');
-    const wh = getCleanWebhookUrl();
-    if (wh) return "wh_" + btoa(wh).replace(/[^a-zA-Z0-9]/g, '').substring(0, 15);
     return "global_default_bot";
   }
 
@@ -484,52 +490,51 @@
   const DEVICE_LOCK_KEY = "daddy_huu_verified_" + currentBotId;
   let isVerifying = false;
 
-  // 3. GUARANTEED TELEBOTCREATOR FORM SUBMISSION (BYPASSES CORS 100%)
-  function executeTelebotWebhook() {
-    const webhookUrl = getCleanWebhookUrl();
+  // 3. SEND EXACT JSON PAYLOAD EXPECTED BY YOUR BOT CODE
+  async function sendBotWebhookPayload() {
+    const params = new URLSearchParams(window.location.search);
+    const rawWebhook = params.get('webhook');
 
-    if (webhookUrl) {
-      // Remove previous dynamic elements if any
-      const oldIframe = document.getElementById('telebot_iframe');
-      if (oldIframe) oldIframe.remove();
-      const oldForm = document.getElementById('telebot_form');
-      if (oldForm) oldForm.remove();
+    if (!rawWebhook) return;
 
-      // Create Invisible Target Iframe
-      const iframe = document.createElement('iframe');
-      iframe.id = 'telebot_iframe';
-      iframe.name = 'telebot_iframe';
-      iframe.style.display = 'none';
-      document.body.appendChild(iframe);
+    const cleanUrl = decodeURIComponent(rawWebhook);
+    const fp = getDeviceFingerprint();
 
-      // Create Form targeting hidden iframe
-      const form = document.createElement('form');
-      form.id = 'telebot_form';
-      form.method = 'GET';
-      form.action = webhookUrl;
-      form.target = 'telebot_iframe';
-      document.body.appendChild(form);
+    // Exact JSON structure parsed by your python code (options.json)
+    const payload = {
+      status: "pass",
+      message: "Verified Successfully",
+      fp: fp,
+      deviceCheckEnabled: true
+    };
 
-      // Submit Form (Triggers /onWebhook in Telebotcreator Backend!)
-      form.submit();
-    }
+    const jsonString = JSON.stringify(payload);
 
-    // Backup: Send Data to Telegram Native WebApp
-    if (window.Telegram && window.Telegram.WebApp) {
-      try {
-        window.Telegram.WebApp.sendData("VERIFIED");
-      } catch(e) {}
-    }
+    // Method A: sendBeacon (Background Guaranteed Send)
+    try {
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      navigator.sendBeacon(cleanUrl, blob);
+    } catch(e) {}
+
+    // Method B: Fetch POST Request
+    try {
+      await fetch(cleanUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: jsonString,
+        keepalive: true
+      });
+    } catch(e) {}
   }
 
-  // 4. CLOSE WEBAPP WITH TIME FOR TELEBOTCREATOR EXECUTION
-  function closeAndRedirect() {
-    executeTelebotWebhook();
-
+  // 4. CLOSE WEBAPP & RETURN TO CHAT
+  function finishAndClose() {
     const params = new URLSearchParams(window.location.search);
     const botName = params.get('botusername') || params.get('bot') || params.get('bot_id');
 
-    // 1.5s Wait so Telebotcreator finishes running BJS command
+    // Wait 1 second so bot processes options.json and sends Main Menu
     setTimeout(() => {
       if (window.Telegram && window.Telegram.WebApp) {
         try { window.Telegram.WebApp.close(); } catch(e) {}
@@ -538,15 +543,13 @@
       if (botName && !botName.startsWith('http')) {
         const cleanName = botName.replace('@', '').trim();
         window.location.href = "https://t.me/" + cleanName;
-      } else if (document.referrer && document.referrer.includes('t.me/')) {
-        window.location.href = document.referrer;
       } else {
         window.location.href = "https://t.me";
       }
-    }, 1500);
+    }, 1000);
   }
 
-  // Extract User Info & Check Verified Lock
+  // On Load: Read User Details & Lock
   window.addEventListener('load', () => {
     const params = new URLSearchParams(window.location.search);
 
@@ -570,7 +573,7 @@
     document.getElementById('userId').innerText = "ID: " + extractedId;
     document.getElementById('avatarText').innerText = extractedName.charAt(0).toUpperCase();
 
-    // Already Verified Check
+    // Lock Check
     const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
     if (isAlreadyVerified) {
       document.getElementById('cardTitle').innerText = "Already Verified";
@@ -584,8 +587,8 @@
     }
   });
 
-  // Start Verification
-  function startVerification() {
+  // Start Verification Process
+  async function startVerification() {
     if (isVerifying) return;
     isVerifying = true;
 
@@ -614,7 +617,7 @@
       }
     }, 120);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       spinner.style.display = "none";
 
       const isAlreadyVerified = localStorage.getItem(DEVICE_LOCK_KEY);
@@ -627,7 +630,7 @@
         text.style.color = "#ef4444";
 
         statusMsg.className = "status-msg danger";
-        statusMsg.innerText = "❌ Security Alert: Device already verified for this bot!";
+        statusMsg.innerText = "❌ Security Alert: Device already verified!";
         statusMsg.style.display = "block";
 
         btnContinue.style.display = "block";
@@ -639,21 +642,23 @@
         text.style.color = "#10b981";
 
         statusMsg.className = "status-msg success";
-        statusMsg.innerText = "✔ Success! Unlocking Bot...";
+        statusMsg.innerText = "✔ Success! Authorizing bot...";
         statusMsg.style.display = "block";
 
         badge.classList.add('active');
         badgeText.innerText = "ACTIVE";
         btnContinue.style.display = "block";
 
-        // 🔥 Fire Form Webhook & Redirect
-        closeAndRedirect();
+        // 🔥 Send required JSON Payload to Webhook & then Close
+        await sendBotWebhookPayload();
+        finishAndClose();
       }
     }, 1500);
   }
 
   function redirectToBot() {
-    closeAndRedirect();
+    sendBotWebhookPayload();
+    finishAndClose();
   }
 </script>
 </body>
