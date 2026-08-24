@@ -37,19 +37,16 @@
       overflow: hidden;
     }
 
-    /* Ambient Constellation Network Lines */
     body::before {
       content: "";
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background-image: 
-        radial-gradient(rgba(0, 210, 255, 0.12) 1px, transparent 1px);
+      background-image: radial-gradient(rgba(0, 210, 255, 0.12) 1px, transparent 1px);
       background-size: 24px 24px;
       z-index: -1;
       pointer-events: none;
     }
 
-    /* Main Modern UI Card matching Screenshot */
     .card {
       background: var(--glass-card);
       backdrop-filter: blur(28px);
@@ -64,7 +61,6 @@
       position: relative;
     }
 
-    /* User Profile Bar */
     .profile-bar {
       display: flex;
       align-items: center;
@@ -72,71 +68,35 @@
       margin-bottom: 28px;
     }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .user-info { display: flex; align-items: center; gap: 12px; }
 
     .avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
+      width: 48px; height: 48px; border-radius: 50%;
       background: linear-gradient(135deg, #ffb347, #ffcc33);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 18px;
-      color: #ffffff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 18px; color: #ffffff;
       box-shadow: 0 4px 15px rgba(255, 179, 71, 0.4);
     }
 
-    .user-details {
-      text-align: left;
-    }
-
-    .user-details h4 {
-      font-size: 16px;
-      font-weight: 700;
-      color: #ffffff;
-    }
-
-    .user-details p {
-      font-size: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      color: #8fa0c0;
-      margin-top: 2px;
-    }
+    .user-details { text-align: left; }
+    .user-details h4 { font-size: 16px; font-weight: 700; color: #ffffff; }
+    .user-details p { font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #8fa0c0; margin-top: 2px; }
 
     .theme-btn {
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #d1dcf0;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
+      padding: 8px 14px; border-radius: 20px;
+      font-size: 12px; font-weight: 600; color: #d1dcf0;
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
     }
 
-    /* Status Pill Badge */
     .status-badge {
       background: rgba(0, 230, 118, 0.1);
       border: 1px solid rgba(0, 230, 118, 0.3);
-      padding: 6px 16px;
-      border-radius: 30px;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--cyber-green);
-      margin-bottom: 24px;
+      padding: 6px 16px; border-radius: 30px;
+      font-size: 11px; font-weight: 800; letter-spacing: 1px;
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--cyber-green); margin-bottom: 24px;
       transition: all 0.3s ease;
     }
 
@@ -153,57 +113,34 @@
     }
 
     .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: currentColor;
-      box-shadow: 0 0 10px currentColor;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: currentColor; box-shadow: 0 0 10px currentColor;
     }
 
-    /* Central Hologram Shield Display */
     .icon-container {
-      position: relative;
-      width: 110px;
-      height: 110px;
-      margin: 0 auto 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: relative; width: 110px; height: 110px;
+      margin: 0 auto 24px; display: flex; align-items: center; justify-content: center;
     }
 
     .outer-circle {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: rgba(0, 210, 255, 0.05);
-      border: 1px solid rgba(0, 210, 255, 0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: absolute; width: 100%; height: 100%; border-radius: 50%;
+      background: rgba(0, 210, 255, 0.05); border: 1px solid rgba(0, 210, 255, 0.15);
+      display: flex; align-items: center; justify-content: center;
     }
 
     .shield-icon-bg {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: rgba(0, 230, 118, 0.12);
-      border: 1.5px solid rgba(0, 230, 118, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
+      width: 64px; height: 64px; border-radius: 50%;
+      background: rgba(0, 230, 118, 0.12); border: 1.5px solid rgba(0, 230, 118, 0.3);
+      display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
     }
 
     .shield-icon-bg.scanning {
-      background: rgba(0, 210, 255, 0.12);
-      border-color: var(--sky-blue);
+      background: rgba(0, 210, 255, 0.12); border-color: var(--sky-blue);
       animation: pulseGlow 1.5s infinite;
     }
 
     .shield-icon-bg.failed {
-      background: rgba(255, 51, 102, 0.12);
-      border-color: var(--cyber-red);
+      background: rgba(255, 51, 102, 0.12); border-color: var(--cyber-red);
     }
 
     @keyframes pulseGlow {
@@ -212,63 +149,35 @@
     }
 
     .shield-icon-bg svg {
-      width: 32px;
-      height: 32px;
-      fill: none;
-      stroke: var(--cyber-green);
-      stroke-width: 2.2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      width: 32px; height: 32px; fill: none;
+      stroke: var(--cyber-green); stroke-width: 2.2;
+      stroke-linecap: round; stroke-linejoin: round;
     }
 
     .shield-icon-bg.scanning svg { stroke: var(--sky-blue); }
     .shield-icon-bg.failed svg { stroke: var(--cyber-red); }
 
-    h2.title {
-      font-size: 22px;
-      font-weight: 800;
-      color: #ffffff;
-      margin-bottom: 6px;
-    }
+    h2.title { font-size: 22px; font-weight: 800; color: #ffffff; margin-bottom: 6px; }
+    p.subtitle { font-size: 13.5px; color: #8fa0c0; margin-bottom: 30px; }
 
-    p.subtitle {
-      font-size: 13.5px;
-      color: #8fa0c0;
-      margin-bottom: 30px;
-    }
-
-    /* Main Action Button matching Screenshot */
     .btn-return {
-      width: 100%;
-      padding: 16px;
-      background: var(--gradient-btn);
-      border: none;
-      border-radius: 20px;
-      color: #ffffff;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 10px 25px rgba(0, 153, 255, 0.35);
+      width: 100%; padding: 16px; background: var(--gradient-btn);
+      border: none; border-radius: 20px; color: #ffffff; font-size: 15px; font-weight: 700;
+      cursor: pointer; box-shadow: 0 10px 25px rgba(0, 153, 255, 0.35);
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .btn-return:active {
-      transform: scale(0.98);
-    }
+    .btn-return:active { transform: scale(0.98); }
 
     .footer-credit {
-      margin-top: 20px;
-      font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
-      color: #5d6f8e;
-      letter-spacing: 0.5px;
+      margin-top: 20px; font-size: 11px;
+      font-family: 'JetBrains Mono', monospace; color: #5d6f8e; letter-spacing: 0.5px;
     }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <!-- User Top Profile Bar -->
     <div class="profile-bar">
       <div class="user-info">
         <div class="avatar" id="avatarText">NP</div>
@@ -277,18 +186,14 @@
           <p id="userId">ID: 1635614128</p>
         </div>
       </div>
-      <button class="theme-btn">
-        <span>✨</span> Theme
-      </button>
+      <button class="theme-btn"><span>✨</span> Theme</button>
     </div>
 
-    <!-- Status Badge -->
     <div class="status-badge scanning" id="statusBadge">
       <div class="status-dot"></div>
       <span id="badgeText">SCANNING...</span>
     </div>
 
-    <!-- Holographic Center Shield -->
     <div class="icon-container">
       <div class="outer-circle">
         <div class="shield-icon-bg scanning" id="shieldBg">
@@ -303,13 +208,10 @@
     <h2 class="title" id="cardTitle">Verifying Device</h2>
     <p class="subtitle" id="cardSubtitle">Securing connection & checking hardware...</p>
 
-    <!-- Return to Bot Action Button -->
     <button class="btn-return" id="btnReturn" onclick="redirectToBot()">Return To Bot</button>
   </div>
 
-  <div class="footer-credit">
-    DEVELOPED BY @Daddy_Huu
-  </div>
+  <div class="footer-credit">DEVELOPED BY @Daddy_Huu</div>
 
 <script>
   if (window.Telegram && window.Telegram.WebApp) {
@@ -319,60 +221,63 @@
     } catch(e) {}
   }
 
-  // UNBYPASSABLE HARDWARE CANVAS & WEBGL FINGERPRINTING
   function generateHardwareFingerprint() {
-    let canvas = document.createElement('canvas');
-    let ctx = canvas.getContext('2d');
-    canvas.width = 200; canvas.height = 50;
-    
-    ctx.textBaseline = "top";
-    ctx.font = "14px 'Arial'";
-    ctx.fillStyle = "#f60";
-    ctx.fillRect(125,1,62,20);
-    ctx.fillStyle = "#069";
-    ctx.fillText("DaddyHuu_Hardware_Check_#2026", 2, 15);
+    try {
+      let canvas = document.createElement('canvas');
+      let ctx = canvas.getContext('2d');
+      canvas.width = 200; canvas.height = 50;
+      
+      ctx.textBaseline = "top";
+      ctx.font = "14px 'Arial'";
+      ctx.fillStyle = "#f60";
+      ctx.fillRect(125,1,62,20);
+      ctx.fillStyle = "#069";
+      ctx.fillText("DaddyHuu_Hardware_Check_#2026", 2, 15);
 
-    let canvasHash = canvas.toDataURL();
-    
-    let gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    let webglVendor = "";
-    if (gl) {
-      let debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-      if (debugInfo) {
-        webglVendor = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+      let canvasHash = canvas.toDataURL();
+      
+      let gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      let webglVendor = "";
+      if (gl) {
+        let debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        if (debugInfo) {
+          webglVendor = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        }
       }
-    }
 
-    const hwSpecs = [
-      canvasHash,
-      webglVendor,
-      screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
-      navigator.hardwareConcurrency || '4',
-      navigator.deviceMemory || '4',
-      Intl.DateTimeFormat().resolvedOptions().timeZone
-    ].join("||");
+      const hwSpecs = [
+        canvasHash,
+        webglVendor,
+        screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
+        navigator.hardwareConcurrency || '4',
+        navigator.deviceMemory || '4',
+        Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+      ].join("||");
 
-    let hash = 0;
-    for (let i = 0; i < hwSpecs.length; i++) {
-      hash = ((hash << 5) - hash) + hwSpecs.charCodeAt(i);
-      hash |= 0;
+      let hash = 0;
+      for (let i = 0; i < hwSpecs.length; i++) {
+        hash = ((hash << 5) - hash) + hwSpecs.charCodeAt(i);
+        hash |= 0;
+      }
+      return 'HW-' + Math.abs(hash).toString(16);
+    } catch(e) {
+      return 'HW-FALLBACK-' + Math.floor(Math.random() * 899999 + 100000);
     }
-    return 'HW-' + Math.abs(hash).toString(16);
   }
 
   async function sendBotWebhookPayload(isPassed) {
-    const params = new URLSearchParams(window.location.search);
-    const rawWebhook = params.get('webhook');
-    if (!rawWebhook) return;
-
-    const payload = {
-      status: isPassed ? "pass" : "fail",
-      message: isPassed ? "Verified Successfully" : "Device Check Failed",
-      fp: generateHardwareFingerprint(),
-      deviceCheckEnabled: true
-    };
-
     try {
+      const params = new URLSearchParams(window.location.search);
+      const rawWebhook = params.get('webhook');
+      if (!rawWebhook) return;
+
+      const payload = {
+        status: isPassed ? "pass" : "fail",
+        message: isPassed ? "Verified Successfully" : "Device Check Failed",
+        fp: generateHardwareFingerprint(),
+        deviceCheckEnabled: true
+      };
+
       await fetch(decodeURIComponent(rawWebhook), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -389,16 +294,21 @@
     }, 400);
   }
 
-  // AUTO SCAN ON LOAD
   window.addEventListener('load', () => {
     let extractedName = "Npta";
     let extractedId = "1635614128";
 
-    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
-      const u = window.Telegram.WebApp.initDataUnsafe.user;
-      extractedName = (u.first_name + " " + (u.last_name || "")).trim();
-      extractedId = u.id;
-    }
+    try {
+      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+        const u = window.Telegram.WebApp.initDataUnsafe.user;
+        if (u.first_name) {
+          extractedName = (u.first_name + " " + (u.last_name || "")).trim();
+        }
+        if (u.id) {
+          extractedId = u.id;
+        }
+      }
+    } catch(e) {}
 
     document.getElementById('userName').innerText = extractedName;
     document.getElementById('userId').innerText = "ID: " + extractedId;
@@ -406,7 +316,6 @@
     let initials = extractedName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
     document.getElementById('avatarText').innerText = initials || "NP";
 
-    // Auto Execution
     runAutoScan();
   });
 
@@ -419,13 +328,12 @@
     const checkPath = document.getElementById('checkPath');
 
     setTimeout(async () => {
-      // SUCCESS STATE
       badge.className = "status-badge";
       badgeText.innerText = "VERIFIED";
       shieldBg.className = "shield-icon-bg";
       cardTitle.innerText = "Verification Complete";
       cardSubtitle.innerText = "Device secured and profile verified.";
-      checkPath.setAttribute("d", "M9 12l2 2 4-4");
+      if (checkPath) checkPath.setAttribute("d", "M9 12l2 2 4-4");
 
       await sendBotWebhookPayload(true);
     }, 1200);
