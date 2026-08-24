@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>VIP Cyber Shield | Ultimate Security Check</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #030712;
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.4);
+      --accent: #a855f7;
+      --cyber-red: #ef4444;
+      --cyber-green: #10b981;
+      --glass-bg: rgba(15, 23, 42, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.22) 0%, transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 0% 50%, rgba(239, 68, 68, 0.12) 0%, transparent 45%);
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 16px; color: #ffffff;
+    }
+
+    .top-header {
+      width: 100%; max-width: 420px; background: var(--glass-bg); backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border); border-radius: 24px; padding: 10px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .user-info { display: flex; align-items: center; gap: 12px; }
+    .avatar {
+      width: 44px; height: 44px; border-radius: 16px; background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: #fff;
+    }
+
+    .user-details h4 { font-size: 14px; font-weight: 700; color: #f8fafc; }
+    .user-details p { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #64748b; }
+
+    .card {
+      background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(28px); border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 36px; padding: 36px 24px; max-width: 420px; width: 100%; text-align: center; margin: auto 0;
+    }
+
+    .icon-wrapper { position: relative; width: 90px; height: 90px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; }
+    .pulse-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px dashed rgba(99, 102, 241, 0.4); animation: spin 12s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .shield-icon {
+      width: 68px; height: 68px; background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 30px var(--primary-glow);
+    }
+    .shield-icon svg { width: 32px; height: 32px; fill: #ffffff; }
+
+    .verify-box {
+      background: rgba(3, 7, 18, 0.6); border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s;
+    }
+    .verify-box.verified { border-color: var(--cyber-green); }
+    .verify-box.failed { border-color: var(--cyber-red); }
+
+    .checkbox {
+      width: 26px; height: 26px; border: 2px solid #334155; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(15, 23, 42, 0.5);
+    }
+    .verify-box.verified .checkbox { background: var(--cyber-green); border-color: var(--cyber-green); }
+    .verify-box.failed .checkbox { background: var(--cyber-red); border-color: var(--cyber-red); }
+
+    .btn-continue {
+      width: 100%; padding: 16px; background: linear-gradient(135deg, var(--primary), #4f46e5);
+      border: none; border-radius: 20px; color: #ffffff; font-size: 14px; font-weight: 800; cursor: pointer; display: none; margin-top: 20px;
+    }
+
+    .footer-area { text-align: center; margin-top: 15px; }
+    .vip-credit { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 8px 20px; border-radius: 50px; color: #94a3b8; font-size: 12px; font-weight: 700; }
+    .vip-credit span { color: #ef4444; font-weight: 800; }
+  </style>
+</head>
+<body>
+
+  <div class="top-header">
+    <div class="user-info">
+      <div class="avatar" id="avatarText">U</div>
+      <div class="user-details">
+        <h4 id="userName">TELEGRAM USER</h4>
+        <p id="userId">ID: --------</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="icon-wrapper">
+      <div class="pulse-ring"></div>
+      <div class="shield-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5zm0 2.18l7 3.89v5.93c0 4.56-3.13 8.84-7 9.88-3.87-1.04-7-5.32-7-9.88V8.07l7-3.89z"/></svg>
+      </div>
+    </div>
+
+    <h2>Cyber Verification</h2>
+    <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Hardware Level Verification</p>
+
+    <div class="verify-box" id="verifyBox" onclick="startVerification()">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="checkbox" id="checkbox"></div>
+        <span id="statusText" style="font-weight:600; font-size:14px;">I am human</span>
+      </div>
+    </div>
+
+    <button class="btn-continue" id="btnContinue" onclick="redirectToBot()">CONTINUE TO BOT</button>
+  </div>
+
+  <div class="footer-area">
+    <div class="vip-credit">DEVELOPED BY <span>@Daddy_Huu</span></div>
+  </div>
+
+<script>
+  if (window.Telegram && window.Telegram.WebApp) {
+    try { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); } catch(e) {}
+  }
+
+  // DEEP HARDWARE CANVAS & WEBGL FINGERPRINTING (Airplane Mode Unbypassable)
+  function generateHardwareFingerprint() {
+    let canvas = document.createElement('canvas');
+    let ctx = canvas.getContext('2d');
+    canvas.width = 200; canvas.height = 50;
+    
+    ctx.textBaseline = "top";
+    ctx.font = "14px 'Arial'";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = "#f60";
+    ctx.fillRect(125,1,62,20);
+    ctx.fillStyle = "#069";
+    ctx.fillText("DaddyHuu_Security_Check_#129", 2, 15);
+    ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+    ctx.fillText("DaddyHuu_Security_Check_#129", 4, 17);
+
+    let canvasHash = canvas.toDataURL();
+    
+    // WebGL Renderer details
+    let gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    let webglVendor = "";
+    if (gl) {
+      let debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+      if (debugInfo) {
+        webglVendor = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+      }
+    }
+
+    const hwSpecs = [
+      canvasHash,
+      webglVendor,
+      screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
+      navigator.hardwareConcurrency || '4',
+      navigator.deviceMemory || '4',
+      Intl.DateTimeFormat().resolvedOptions().timeZone
+    ].join("||");
+
+    let hash = 0;
+    for (let i = 0; i < hwSpecs.length; i++) {
+      hash = ((hash << 5) - hash) + hwSpecs.charCodeAt(i);
+      hash |= 0;
+    }
+    return 'HW-' + Math.abs(hash).toString(16);
+  }
+
+  async function sendBotWebhookPayload() {
+    const params = new URLSearchParams(window.location.search);
+    const rawWebhook = params.get('webhook');
+    if (!rawWebhook) return;
+
+    const payload = {
+      status: "pass",
+      message: "Verified Successfully",
+      fp: generateHardwareFingerprint(),
+      deviceCheckEnabled: true
+    };
+
+    try {
+      await fetch(decodeURIComponent(rawWebhook), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch(e) {}
+  }
+
+  function finishAndClose() {
+    setTimeout(() => {
+      if (window.Telegram && window.Telegram.WebApp) {
+        try { window.Telegram.WebApp.close(); } catch(e) {}
+      }
+    }, 800);
+  }
+
+  window.addEventListener('load', () => {
+    let extractedName = "TELEGRAM USER";
+    let extractedId = "6259793146";
+
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+      const u = window.Telegram.WebApp.initDataUnsafe.user;
+      extractedName = (u.first_name + " " + (u.last_name || "")).trim();
+      extractedId = u.id;
+    }
+
+    document.getElementById('userName').innerText = extractedName.toUpperCase();
+    document.getElementById('userId').innerText = "ID: " + extractedId;
+    document.getElementById('avatarText').innerText = extractedName.charAt(0).toUpperCase();
+  });
+
+  async function startVerification() {
+    const box = document.getElementById('verifyBox');
+    const text = document.getElementById('statusText');
+    const btnContinue = document.getElementById('btnContinue');
+
+    text.innerText = "Analyzing Hardware Security...";
+
+    setTimeout(async () => {
+      box.classList.add('verified');
+      text.innerText = "Verified Successfully!";
+      text.style.color = "#10b981";
+      btnContinue.style.display = "block";
+
+      await sendBotWebhookPayload();
+      finishAndClose();
+    }, 1000);
+  }
+
+  function redirectToBot() { finishAndClose(); }
+</script>
+</body>
+</html>
