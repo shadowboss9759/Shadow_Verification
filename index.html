@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Dev Veri | Premium Verification</title>
+  <title>Security Verification Engine</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   
@@ -29,46 +29,27 @@
         radial-gradient(circle at 100% 100%, rgba(110, 0, 255, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 0% 50%, rgba(0, 210, 255, 0.1) 0%, transparent 45%);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      color: #ffffff;
-      overflow: hidden;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 16px; color: #ffffff; overflow: hidden;
     }
 
     body::before {
-      content: "";
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
+      content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-image: radial-gradient(rgba(0, 210, 255, 0.12) 1px, transparent 1px);
-      background-size: 24px 24px;
-      z-index: -1;
-      pointer-events: none;
+      background-size: 24px 24px; z-index: -1; pointer-events: none;
     }
 
     .card {
       background: var(--glass-card);
-      backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
-      border: 1px solid var(--glass-border);
-      border-radius: 36px;
-      padding: 32px 24px;
-      max-width: 380px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--glass-border); border-radius: 36px;
+      padding: 32px 24px; max-width: 380px; width: 100%;
+      text-align: center; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
       position: relative;
     }
 
-    .profile-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 24px;
-    }
-
+    .profile-bar { display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
     .user-info { display: flex; align-items: center; gap: 14px; }
 
     .avatar {
@@ -90,81 +71,28 @@
       margin-bottom: 24px; transition: all 0.3s ease;
     }
 
-    .status-badge.scanning {
-      color: var(--sky-blue);
-      border: 1px solid rgba(0, 210, 255, 0.3);
-      background: rgba(0, 210, 255, 0.1);
-    }
+    .status-badge.scanning { color: var(--sky-blue); border: 1px solid rgba(0, 210, 255, 0.3); background: rgba(0, 210, 255, 0.1); }
+    .status-badge.verified { color: var(--cyber-green); border: 1px solid rgba(0, 230, 118, 0.3); background: rgba(0, 230, 118, 0.1); }
+    .status-badge.already-verified { color: var(--sky-blue); border: 1px solid rgba(0, 210, 255, 0.4); background: rgba(0, 210, 255, 0.15); }
+    .status-badge.failed { color: var(--cyber-red); border: 1px solid rgba(255, 51, 102, 0.3); background: rgba(255, 51, 102, 0.1); }
 
-    .status-badge.verified {
-      color: var(--cyber-green);
-      border: 1px solid rgba(0, 230, 118, 0.3);
-      background: rgba(0, 230, 118, 0.1);
-    }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
 
-    .status-badge.already-verified {
-      color: var(--sky-blue);
-      border: 1px solid rgba(0, 210, 255, 0.4);
-      background: rgba(0, 210, 255, 0.15);
-    }
-
-    .status-badge.failed {
-      color: var(--cyber-red);
-      border: 1px solid rgba(255, 51, 102, 0.3);
-      background: rgba(255, 51, 102, 0.1);
-    }
-
-    .status-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: currentColor; box-shadow: 0 0 10px currentColor;
-    }
-
-    .icon-container {
-      position: relative; width: 110px; height: 110px;
-      margin: 0 auto 24px; display: flex; align-items: center; justify-content: center;
-    }
-
-    .outer-circle {
-      position: absolute; width: 100%; height: 100%; border-radius: 50%;
-      background: rgba(0, 210, 255, 0.05); border: 1px solid rgba(0, 210, 255, 0.15);
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    .shield-icon-bg {
-      width: 64px; height: 64px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;
-    }
-
-    .shield-icon-bg.scanning {
-      background: rgba(0, 210, 255, 0.12); border: 1.5px solid var(--sky-blue);
-      animation: pulseGlow 1.5s infinite;
-    }
-
-    .shield-icon-bg.verified {
-      background: rgba(0, 230, 118, 0.12); border: 1.5px solid var(--cyber-green);
-      box-shadow: 0 0 20px rgba(0, 230, 118, 0.3);
-    }
-
-    .shield-icon-bg.already-verified {
-      background: rgba(0, 210, 255, 0.12); border: 1.5px solid var(--sky-blue);
-      box-shadow: 0 0 20px var(--sky-blue-glow);
-    }
-
-    .shield-icon-bg.failed {
-      background: rgba(255, 51, 102, 0.12); border: 1.5px solid var(--cyber-red);
-      box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
-    }
+    .icon-container { position: relative; width: 110px; height: 110px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; }
+    .outer-circle { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: rgba(0, 210, 255, 0.05); border: 1px solid rgba(0, 210, 255, 0.15); display: flex; align-items: center; justify-content: center; }
+    
+    .shield-icon-bg { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+    .shield-icon-bg.scanning { background: rgba(0, 210, 255, 0.12); border: 1.5px solid var(--sky-blue); animation: pulseGlow 1.5s infinite; }
+    .shield-icon-bg.verified { background: rgba(0, 230, 118, 0.12); border: 1.5px solid var(--cyber-green); box-shadow: 0 0 20px rgba(0, 230, 118, 0.3); }
+    .shield-icon-bg.already-verified { background: rgba(0, 210, 255, 0.12); border: 1.5px solid var(--sky-blue); box-shadow: 0 0 20px var(--sky-blue-glow); }
+    .shield-icon-bg.failed { background: rgba(255, 51, 102, 0.12); border: 1.5px solid var(--cyber-red); box-shadow: 0 0 20px rgba(255, 51, 102, 0.3); }
 
     @keyframes pulseGlow {
       0%, 100% { box-shadow: 0 0 15px var(--sky-blue-glow); transform: scale(1); }
       50% { box-shadow: 0 0 28px var(--sky-blue-glow); transform: scale(1.05); }
     }
 
-    .shield-icon-bg svg {
-      width: 32px; height: 32px; fill: none;
-      stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
-    }
-
+    .shield-icon-bg svg { width: 32px; height: 32px; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
     .shield-icon-bg.scanning svg { stroke: var(--sky-blue); }
     .shield-icon-bg.verified svg { stroke: var(--cyber-green); }
     .shield-icon-bg.already-verified svg { stroke: var(--sky-blue); }
@@ -176,21 +104,12 @@
     .btn-return {
       width: 100%; padding: 16px; background: var(--gradient-btn);
       border: none; border-radius: 20px; color: #ffffff; font-size: 15px; font-weight: 700;
-      cursor: pointer; box-shadow: 0 10px 25px rgba(0, 153, 255, 0.35);
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer; box-shadow: 0 10px 25px rgba(0, 153, 255, 0.35); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-
-    .btn-return.failed-btn {
-      background: var(--gradient-btn-fail);
-      box-shadow: 0 10px 25px rgba(255, 51, 102, 0.35);
-    }
-
+    .btn-return.failed-btn { background: var(--gradient-btn-fail); box-shadow: 0 10px 25px rgba(255, 51, 102, 0.35); }
     .btn-return:active { transform: scale(0.98); }
 
-    .footer-credit {
-      margin-top: 20px; font-size: 11px;
-      font-family: 'JetBrains Mono', monospace; color: #5d6f8e; letter-spacing: 0.5px;
-    }
+    .footer-credit { margin-top: 20px; font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #5d6f8e; letter-spacing: 0.5px; }
   </style>
 </head>
 <body>
@@ -200,7 +119,7 @@
       <div class="user-info">
         <div class="avatar" id="avatarText">TG</div>
         <div class="user-details">
-          <h4 id="userName">User</h4>
+          <h4 id="userName">Telegram User</h4>
           <p id="userId">ID: Fetching...</p>
         </div>
       </div>
@@ -225,7 +144,7 @@
     <h2 class="title" id="cardTitle">Scanning Device</h2>
     <p class="subtitle" id="cardSubtitle">Checking hardware security & environment integrity...</p>
 
-    <button class="btn-return" id="btnReturn" onclick="redirectToBot()">Return To Bot</button>
+    <button class="btn-return" id="btnReturn" onclick="closeWebApp()">Return To Bot</button>
   </div>
 
   <div class="footer-credit">HARDWARE SECURITY ENGINE</div>
@@ -238,18 +157,15 @@
     } catch(e) {}
   }
 
-  // WebGL & Canvas Hardware Fingerprint Engine
-  function generateHardwareFingerprint() {
+  // Cross-App Physical Device Fingerprint Engine
+  function getHardwareFingerprint() {
     try {
       let canvas = document.createElement('canvas');
       let ctx = canvas.getContext('2d');
       canvas.width = 200; canvas.height = 50;
-      ctx.textBaseline = "top";
-      ctx.font = "14px 'Arial'";
-      ctx.fillStyle = "#f60";
-      ctx.fillRect(125,1,62,20);
-      ctx.fillStyle = "#069";
-      ctx.fillText("Universal_HW_Fingerprint_2026", 2, 15);
+      ctx.textBaseline = "top"; ctx.font = "14px 'Arial'"; ctx.fillStyle = "#f60";
+      ctx.fillRect(125,1,62,20); ctx.fillStyle = "#069";
+      ctx.fillText("Physical_Device_Security_2026", 2, 15);
       let canvasHash = canvas.toDataURL();
       
       let gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
@@ -259,7 +175,7 @@
         if (debugInfo) webglVendor = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
       }
 
-      const hwSpecs = [
+      const hwData = [
         canvasHash, webglVendor,
         screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
         navigator.hardwareConcurrency || '4',
@@ -268,8 +184,8 @@
       ].join("||");
 
       let hash = 0;
-      for (let i = 0; i < hwSpecs.length; i++) {
-        hash = ((hash << 5) - hash) + hwSpecs.charCodeAt(i);
+      for (let i = 0; i < hwData.length; i++) {
+        hash = ((hash << 5) - hash) + hwData.charCodeAt(i);
         hash |= 0;
       }
       return 'HW-' + Math.abs(hash).toString(16);
@@ -278,16 +194,15 @@
     }
   }
 
-  // Safe Webhook Payload Sender
-  async function sendBotWebhookPayload(isPassed, fp) {
+  async function postBotWebhook(status, message, fp) {
     try {
       const params = new URLSearchParams(window.location.search);
       const rawWebhook = params.get('webhook');
       if (!rawWebhook) return;
 
       const payload = {
-        status: isPassed ? "pass" : "fail",
-        message: isPassed ? "Verified Successfully" : "Device Check Failed",
+        status: status,
+        message: message,
         fp: fp,
         deviceCheckEnabled: true
       };
@@ -301,27 +216,26 @@
   }
 
   window.addEventListener('load', () => {
-    let extractedName = "Telegram User";
-    let extractedId = "1635614128";
+    let userName = "Telegram User";
+    let userId = "1635614128";
 
     try {
       if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
         const u = window.Telegram.WebApp.initDataUnsafe.user;
-        if (u.first_name) extractedName = (u.first_name + " " + (u.last_name || "")).trim();
-        if (u.id) extractedId = u.id;
+        if (u.first_name) userName = (u.first_name + " " + (u.last_name || "")).trim();
+        if (u.id) userId = u.id;
       }
     } catch(e) {}
 
-    document.getElementById('userName').innerText = extractedName;
-    document.getElementById('userId').innerText = "ID: " + extractedId;
-    
-    let initials = extractedName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    document.getElementById('userName').innerText = userName;
+    document.getElementById('userId').innerText = "ID: " + userId;
+    let initials = userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
     document.getElementById('avatarText').innerText = initials || "TG";
 
-    executeUniversalScan();
+    startVerificationFlow();
   });
 
-  function executeUniversalScan() {
+  function startVerificationFlow() {
     const badge = document.getElementById('statusBadge');
     const badgeText = document.getElementById('badgeText');
     const shieldBg = document.getElementById('shieldBg');
@@ -330,58 +244,78 @@
     const checkPath = document.getElementById('checkPath');
     const btnReturn = document.getElementById('btnReturn');
 
-    const fp = generateHardwareFingerprint();
+    const fp = getHardwareFingerprint();
     const params = new URLSearchParams(window.location.search);
     
     const isAlreadyVerified = params.get('verified') === 'yes';
-    const forceFail = params.get('fail') === 'true' || params.get('force_fail') === 'true';
+    const isVpn = params.get('vpn') === 'true';
+    const isClone = params.get('clone') === 'true';
+    const forceFail = params.get('fail') === 'true';
 
-    // Step 1: Initial Hardware Scan (0s - 2s)
+    // Phase 1: Processing Status (0s - 2s)
     badge.className = "status-badge scanning";
     badgeText.innerText = "SCANNING HARDWARE...";
 
-    // Step 2: Intermediate Profile Check (2s - 3.5s)
     setTimeout(() => {
       badgeText.innerText = "ANALYZING ENVIRONMENT...";
-    }, 1800);
+    }, 1500);
 
-    // Step 3: Final State Rendering (Exact 3.5 sec Delay)
+    // Phase 2: Final Resolution (3.5 Seconds Delay)
     setTimeout(async () => {
-      if (forceFail) {
-        // STATE 1: FAILED STATE
+      if (isVpn) {
+        badge.className = "status-badge failed";
+        badgeText.innerText = "VPN DETECTED";
+        shieldBg.className = "shield-icon-bg failed";
+        cardTitle.innerText = "VPN Detected";
+        cardSubtitle.innerText = "Please disable your VPN service and try again.";
+        if (checkPath) checkPath.setAttribute("d", "M18 6L6 18M6 6l12 12");
+        btnReturn.className = "btn-return failed-btn";
+        await postBotWebhook("fail", "VPN Detected", fp);
+
+      } else if (isClone) {
+        badge.className = "status-badge failed";
+        badgeText.innerText = "UNOFFICIAL APP";
+        shieldBg.className = "shield-icon-bg failed";
+        cardTitle.innerText = "Clone App Detected";
+        cardSubtitle.innerText = "Please use official Telegram app to complete verification.";
+        if (checkPath) checkPath.setAttribute("d", "M18 6L6 18M6 6l12 12");
+        btnReturn.className = "btn-return failed-btn";
+        await postBotWebhook("fail", "Clone App Detected", fp);
+
+      } else if (forceFail) {
         badge.className = "status-badge failed";
         badgeText.innerText = "VERIFICATION FAILED";
         shieldBg.className = "shield-icon-bg failed";
         cardTitle.innerText = "Verification Failed";
-        cardSubtitle.innerText = "Suspicious environment or duplicate device detected.";
+        cardSubtitle.innerText = "System validation could not be completed.";
         if (checkPath) checkPath.setAttribute("d", "M18 6L6 18M6 6l12 12");
         btnReturn.className = "btn-return failed-btn";
-        btnReturn.innerText = "Close Application";
-        await sendBotWebhookPayload(false, fp);
+        await postBotWebhook("fail", "Verification Failed", fp);
 
       } else if (isAlreadyVerified) {
-        // STATE 2: ALREADY VERIFIED STATE
+        // MATCHES YOUR BOT: status = "pass" & message = "Already Verified"
         badge.className = "status-badge already-verified";
         badgeText.innerText = "ALREADY VERIFIED";
         shieldBg.className = "shield-icon-bg already-verified";
         cardTitle.innerText = "Already Verified";
-        cardSubtitle.innerText = "Your account and device are already active in the system.";
+        cardSubtitle.innerText = "Your device profile is already validated in the database.";
         if (checkPath) checkPath.setAttribute("d", "M9 12l2 2 4-4");
+        await postBotWebhook("pass", "Already Verified", fp);
 
       } else {
-        // STATE 3: FRESH VERIFICATION PASSED
+        // MATCHES YOUR BOT: status = "pass" & message = "Verified Successfully"
         badge.className = "status-badge verified";
         badgeText.innerText = "VERIFICATION PASSED";
         shieldBg.className = "shield-icon-bg verified";
         cardTitle.innerText = "Verification Complete";
         cardSubtitle.innerText = "Device secured and profile successfully verified.";
         if (checkPath) checkPath.setAttribute("d", "M9 12l2 2 4-4");
-        await sendBotWebhookPayload(true, fp);
+        await postBotWebhook("pass", "Verified Successfully", fp);
       }
     }, 3500);
   }
 
-  function redirectToBot() {
+  function closeWebApp() {
     if (window.Telegram && window.Telegram.WebApp) {
       try { window.Telegram.WebApp.close(); } catch(e) {}
     }
