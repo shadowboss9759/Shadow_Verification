@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>VIP Cyber Shield | Ultimate Security Check</title>
+  <title>Dev Veri | Premium Verification</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg-dark: #030712;
-      --primary: #6366f1;
-      --primary-glow: rgba(99, 102, 241, 0.4);
-      --accent: #a855f7;
-      --cyber-red: #ef4444;
-      --cyber-green: #10b981;
-      --glass-bg: rgba(15, 23, 42, 0.65);
-      --glass-border: rgba(255, 255, 255, 0.08);
+      --bg-dark: #070d19;
+      --sky-blue: #00d2ff;
+      --sky-blue-glow: rgba(0, 210, 255, 0.4);
+      --gradient-btn: linear-gradient(135deg, #0099ff, #6e00ff);
+      --glass-card: rgba(13, 22, 40, 0.75);
+      --glass-border: rgba(0, 210, 255, 0.18);
+      --cyber-green: #00e676;
+      --cyber-red: #ff3366;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -24,108 +24,302 @@
     body {
       background-color: var(--bg-dark);
       background-image: 
-        radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.22) 0%, transparent 60%),
-        radial-gradient(circle at 100% 100%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 0% 50%, rgba(239, 68, 68, 0.12) 0%, transparent 45%);
-      min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 16px; color: #ffffff;
+        radial-gradient(circle at 50% 0%, rgba(0, 153, 255, 0.2) 0%, transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(110, 0, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 0% 50%, rgba(0, 210, 255, 0.1) 0%, transparent 45%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      color: #ffffff;
+      overflow: hidden;
     }
 
-    .top-header {
-      width: 100%; max-width: 420px; background: var(--glass-bg); backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border); border-radius: 24px; padding: 10px 16px;
-      display: flex; align-items: center; justify-content: space-between;
+    /* Ambient Constellation Network Lines */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        radial-gradient(rgba(0, 210, 255, 0.12) 1px, transparent 1px);
+      background-size: 24px 24px;
+      z-index: -1;
+      pointer-events: none;
     }
 
-    .user-info { display: flex; align-items: center; gap: 12px; }
-    .avatar {
-      width: 44px; height: 44px; border-radius: 16px; background: linear-gradient(135deg, var(--primary), var(--accent));
-      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: #fff;
-    }
-
-    .user-details h4 { font-size: 14px; font-weight: 700; color: #f8fafc; }
-    .user-details p { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #64748b; }
-
+    /* Main Modern UI Card matching Screenshot */
     .card {
-      background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(28px); border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 36px; padding: 36px 24px; max-width: 420px; width: 100%; text-align: center; margin: auto 0;
+      background: var(--glass-card);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--glass-border);
+      border-radius: 36px;
+      padding: 28px 24px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
     }
 
-    .icon-wrapper { position: relative; width: 90px; height: 90px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; }
-    .pulse-ring { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px dashed rgba(99, 102, 241, 0.4); animation: spin 12s linear infinite; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-
-    .shield-icon {
-      width: 68px; height: 68px; background: linear-gradient(135deg, var(--primary), var(--accent));
-      border-radius: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 30px var(--primary-glow);
-    }
-    .shield-icon svg { width: 32px; height: 32px; fill: #ffffff; }
-
-    .verify-box {
-      background: rgba(3, 7, 18, 0.6); border: 1.5px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.3s;
-    }
-    .verify-box.verified { border-color: var(--cyber-green); }
-    .verify-box.failed { border-color: var(--cyber-red); }
-
-    .checkbox {
-      width: 26px; height: 26px; border: 2px solid #334155; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(15, 23, 42, 0.5);
-    }
-    .verify-box.verified .checkbox { background: var(--cyber-green); border-color: var(--cyber-green); }
-    .verify-box.failed .checkbox { background: var(--cyber-red); border-color: var(--cyber-red); }
-
-    .btn-continue {
-      width: 100%; padding: 16px; background: linear-gradient(135deg, var(--primary), #4f46e5);
-      border: none; border-radius: 20px; color: #ffffff; font-size: 14px; font-weight: 800; cursor: pointer; display: none; margin-top: 20px;
+    /* User Profile Bar */
+    .profile-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
     }
 
-    .footer-area { text-align: center; margin-top: 15px; }
-    .vip-credit { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); padding: 8px 20px; border-radius: 50px; color: #94a3b8; font-size: 12px; font-weight: 700; }
-    .vip-credit span { color: #ef4444; font-weight: 800; }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffb347, #ffcc33);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(255, 179, 71, 0.4);
+    }
+
+    .user-details {
+      text-align: left;
+    }
+
+    .user-details h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .user-details p {
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #8fa0c0;
+      margin-top: 2px;
+    }
+
+    .theme-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #d1dcf0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    /* Status Pill Badge */
+    .status-badge {
+      background: rgba(0, 230, 118, 0.1);
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--cyber-green);
+      margin-bottom: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .status-badge.scanning {
+      color: var(--sky-blue);
+      border-color: rgba(0, 210, 255, 0.3);
+      background: rgba(0, 210, 255, 0.1);
+    }
+
+    .status-badge.failed {
+      color: var(--cyber-red);
+      border-color: rgba(255, 51, 102, 0.3);
+      background: rgba(255, 51, 102, 0.1);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    /* Central Hologram Shield Display */
+    .icon-container {
+      position: relative;
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .outer-circle {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(0, 210, 255, 0.05);
+      border: 1px solid rgba(0, 210, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .shield-icon-bg {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(0, 230, 118, 0.12);
+      border: 1.5px solid rgba(0, 230, 118, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .shield-icon-bg.scanning {
+      background: rgba(0, 210, 255, 0.12);
+      border-color: var(--sky-blue);
+      animation: pulseGlow 1.5s infinite;
+    }
+
+    .shield-icon-bg.failed {
+      background: rgba(255, 51, 102, 0.12);
+      border-color: var(--cyber-red);
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px var(--sky-blue-glow); transform: scale(1); }
+      50% { box-shadow: 0 0 28px var(--sky-blue-glow); transform: scale(1.05); }
+    }
+
+    .shield-icon-bg svg {
+      width: 32px;
+      height: 32px;
+      fill: none;
+      stroke: var(--cyber-green);
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .shield-icon-bg.scanning svg { stroke: var(--sky-blue); }
+    .shield-icon-bg.failed svg { stroke: var(--cyber-red); }
+
+    h2.title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    p.subtitle {
+      font-size: 13.5px;
+      color: #8fa0c0;
+      margin-bottom: 30px;
+    }
+
+    /* Main Action Button matching Screenshot */
+    .btn-return {
+      width: 100%;
+      padding: 16px;
+      background: var(--gradient-btn);
+      border: none;
+      border-radius: 20px;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(0, 153, 255, 0.35);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-return:active {
+      transform: scale(0.98);
+    }
+
+    .footer-credit {
+      margin-top: 20px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #5d6f8e;
+      letter-spacing: 0.5px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="top-header">
-    <div class="user-info">
-      <div class="avatar" id="avatarText">U</div>
-      <div class="user-details">
-        <h4 id="userName">TELEGRAM USER</h4>
-        <p id="userId">ID: --------</p>
-      </div>
-    </div>
-  </div>
-
   <div class="card">
-    <div class="icon-wrapper">
-      <div class="pulse-ring"></div>
-      <div class="shield-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5zm0 2.18l7 3.89v5.93c0 4.56-3.13 8.84-7 9.88-3.87-1.04-7-5.32-7-9.88V8.07l7-3.89z"/></svg>
+    <!-- User Top Profile Bar -->
+    <div class="profile-bar">
+      <div class="user-info">
+        <div class="avatar" id="avatarText">NP</div>
+        <div class="user-details">
+          <h4 id="userName">Npta</h4>
+          <p id="userId">ID: 1635614128</p>
+        </div>
+      </div>
+      <button class="theme-btn">
+        <span>✨</span> Theme
+      </button>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="status-badge scanning" id="statusBadge">
+      <div class="status-dot"></div>
+      <span id="badgeText">SCANNING...</span>
+    </div>
+
+    <!-- Holographic Center Shield -->
+    <div class="icon-container">
+      <div class="outer-circle">
+        <div class="shield-icon-bg scanning" id="shieldBg">
+          <svg id="shieldSvg" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path id="checkPath" d="M9 12l2 2 4-4" />
+          </svg>
+        </div>
       </div>
     </div>
 
-    <h2>Cyber Verification</h2>
-    <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Hardware Level Verification</p>
+    <h2 class="title" id="cardTitle">Verifying Device</h2>
+    <p class="subtitle" id="cardSubtitle">Securing connection & checking hardware...</p>
 
-    <div class="verify-box" id="verifyBox" onclick="startVerification()">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <div class="checkbox" id="checkbox"></div>
-        <span id="statusText" style="font-weight:600; font-size:14px;">I am human</span>
-      </div>
-    </div>
-
-    <button class="btn-continue" id="btnContinue" onclick="redirectToBot()">CONTINUE TO BOT</button>
+    <!-- Return to Bot Action Button -->
+    <button class="btn-return" id="btnReturn" onclick="redirectToBot()">Return To Bot</button>
   </div>
 
-  <div class="footer-area">
-    <div class="vip-credit">DEVELOPED BY <span>@Daddy_Huu</span></div>
+  <div class="footer-credit">
+    DEVELOPED BY @Daddy_Huu
   </div>
 
 <script>
   if (window.Telegram && window.Telegram.WebApp) {
-    try { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); } catch(e) {}
+    try {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+    } catch(e) {}
   }
 
-  // DEEP HARDWARE CANVAS & WEBGL FINGERPRINTING (Airplane Mode Unbypassable)
+  // UNBYPASSABLE HARDWARE CANVAS & WEBGL FINGERPRINTING
   function generateHardwareFingerprint() {
     let canvas = document.createElement('canvas');
     let ctx = canvas.getContext('2d');
@@ -133,17 +327,13 @@
     
     ctx.textBaseline = "top";
     ctx.font = "14px 'Arial'";
-    ctx.textBaseline = "alphabetic";
     ctx.fillStyle = "#f60";
     ctx.fillRect(125,1,62,20);
     ctx.fillStyle = "#069";
-    ctx.fillText("DaddyHuu_Security_Check_#129", 2, 15);
-    ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
-    ctx.fillText("DaddyHuu_Security_Check_#129", 4, 17);
+    ctx.fillText("DaddyHuu_Hardware_Check_#2026", 2, 15);
 
     let canvasHash = canvas.toDataURL();
     
-    // WebGL Renderer details
     let gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
     let webglVendor = "";
     if (gl) {
@@ -170,14 +360,14 @@
     return 'HW-' + Math.abs(hash).toString(16);
   }
 
-  async function sendBotWebhookPayload() {
+  async function sendBotWebhookPayload(isPassed) {
     const params = new URLSearchParams(window.location.search);
     const rawWebhook = params.get('webhook');
     if (!rawWebhook) return;
 
     const payload = {
-      status: "pass",
-      message: "Verified Successfully",
+      status: isPassed ? "pass" : "fail",
+      message: isPassed ? "Verified Successfully" : "Device Check Failed",
       fp: generateHardwareFingerprint(),
       deviceCheckEnabled: true
     };
@@ -196,12 +386,13 @@
       if (window.Telegram && window.Telegram.WebApp) {
         try { window.Telegram.WebApp.close(); } catch(e) {}
       }
-    }, 800);
+    }, 400);
   }
 
+  // AUTO SCAN ON LOAD
   window.addEventListener('load', () => {
-    let extractedName = "TELEGRAM USER";
-    let extractedId = "6259793146";
+    let extractedName = "Npta";
+    let extractedId = "1635614128";
 
     if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
       const u = window.Telegram.WebApp.initDataUnsafe.user;
@@ -209,30 +400,40 @@
       extractedId = u.id;
     }
 
-    document.getElementById('userName').innerText = extractedName.toUpperCase();
+    document.getElementById('userName').innerText = extractedName;
     document.getElementById('userId').innerText = "ID: " + extractedId;
-    document.getElementById('avatarText').innerText = extractedName.charAt(0).toUpperCase();
+    
+    let initials = extractedName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    document.getElementById('avatarText').innerText = initials || "NP";
+
+    // Auto Execution
+    runAutoScan();
   });
 
-  async function startVerification() {
-    const box = document.getElementById('verifyBox');
-    const text = document.getElementById('statusText');
-    const btnContinue = document.getElementById('btnContinue');
-
-    text.innerText = "Analyzing Hardware Security...";
+  async function runAutoScan() {
+    const badge = document.getElementById('statusBadge');
+    const badgeText = document.getElementById('badgeText');
+    const shieldBg = document.getElementById('shieldBg');
+    const cardTitle = document.getElementById('cardTitle');
+    const cardSubtitle = document.getElementById('cardSubtitle');
+    const checkPath = document.getElementById('checkPath');
 
     setTimeout(async () => {
-      box.classList.add('verified');
-      text.innerText = "Verified Successfully!";
-      text.style.color = "#10b981";
-      btnContinue.style.display = "block";
+      // SUCCESS STATE
+      badge.className = "status-badge";
+      badgeText.innerText = "VERIFIED";
+      shieldBg.className = "shield-icon-bg";
+      cardTitle.innerText = "Verification Complete";
+      cardSubtitle.innerText = "Device secured and profile verified.";
+      checkPath.setAttribute("d", "M9 12l2 2 4-4");
 
-      await sendBotWebhookPayload();
-      finishAndClose();
-    }, 1000);
+      await sendBotWebhookPayload(true);
+    }, 1200);
   }
 
-  function redirectToBot() { finishAndClose(); }
+  function redirectToBot() {
+    finishAndClose();
+  }
 </script>
 </body>
 </html>
